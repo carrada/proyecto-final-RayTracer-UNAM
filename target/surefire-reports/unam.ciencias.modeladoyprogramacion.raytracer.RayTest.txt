@@ -1,0 +1,15 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.RayTest
+-------------------------------------------------------------------------------
+Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s - in unam.ciencias.modeladoyprogramacion.raytracer.RayTest
+constructor_throwsOnNullDirection  Time elapsed: 0 s
+constructor_normalizesDirection  Time elapsed: 0 s
+equals_returnsFalseForDifferentRays  Time elapsed: 0 s
+at_calculatesPointAlongRay  Time elapsed: 0 s
+equals_returnsFalseForDifferentClass  Time elapsed: 0 s
+equals_returnsTrueForIdenticalRays  Time elapsed: 0 s
+equals_returnsFalseForNull  Time elapsed: 0 s
+toString_returnsFormattedString  Time elapsed: 0 s
+hashCode_isConsistent  Time elapsed: 0 s
+constructor_createsValidRay  Time elapsed: 0.001 s
+constructor_throwsOnNullOrigin  Time elapsed: 0.001 s

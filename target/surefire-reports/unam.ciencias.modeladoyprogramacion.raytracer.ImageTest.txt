@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.ImageTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.046 s - in unam.ciencias.modeladoyprogramacion.raytracer.ImageTest
+buildBufferedImage_createsBufferedImageFromImage  Time elapsed: 0.023 s
+setColorAt_andGetColorAt_work  Time elapsed: 0 s
+build_createsImageFromBufferedImage  Time elapsed: 0.011 s
+constructor_createsImageWithCorrectDimensions  Time elapsed: 0.011 s

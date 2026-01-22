@@ -1,0 +1,101 @@
+#! /usr/bin/env bash
+
+set -euo pipefail
+
+# Integration tests for Matrix Addition
+# Usage:
+#   ./run-tests-matrix-addion            # uses THREADS=4 by default
+#   THREADS=8 ./run-tests-matrix-addion  # override number of threads
+
+THREADS=${THREADS:-4}
+EXAMPLES_DIR="examples/matrix_sum"
+ACTUAL_PREFIX="${EXAMPLES_DIR}/actual-output"
+
+# 1) Build the project (skip unit tests for speed)
+echo "Building project (skipping tests)..."
+./mvnw -q -DskipTests package
+
+# 2) Resolve the JAR to execute
+# Try common names, then fallback to the newest jar in target/
+declare -a CANDIDATES=("target/practica-03-1.0.jar")
+JAR_PATH=""
+for c in "${CANDIDATES[@]}"; do
+  if [[ -f "$c" ]]; then
+    JAR_PATH="$c"
+    break
+  fi
+done
+
+if [[ -z "$JAR_PATH" ]]; then
+  JAR_PATH=$(ls -t target/*.jar 2>/dev/null | head -n1 || true)
+fi
+
+if [[ -z "${JAR_PATH}" || ! -f "${JAR_PATH}" ]]; then
+  echo "ERROR: Could not find a JAR in target/.\n       Expected one of: ${CANDIDATES[*]} or any target/*.jar"
+  exit 2
+fi
+
+echo "Using JAR: ${JAR_PATH}"
+echo
+
+# 3) Discover test cases
+shopt -s nullglob
+cases=("${EXAMPLES_DIR}"/expected-output-*.txt)
+TOTAL=${#cases[@]}
+if (( TOTAL == 0 )); then
+  echo "ERROR: No expected-output-*.txt files found under ${EXAMPLES_DIR}"
+  exit 2
+else
+  echo "Discovered ${TOTAL} test cases."
+  echo "${cases[@]}"
+fi
+
+pass=0
+fail=0
+
+for expected in "${cases[@]}"; do
+  base=$(basename "$expected")
+  id="${base#expected-output-}"
+  id="${id%.txt}"
+  input="${EXAMPLES_DIR}/input-${id}.txt"
+  actual="${ACTUAL_PREFIX}-${id}.txt"
+
+  if [[ ! -f "${input}" ]]; then
+    echo "Case ${id}: SKIP (missing input file ${input})"
+    ((++fail))
+    continue
+  fi
+
+  echo "Case ${id}: running..."
+  set +e
+  java -jar "${JAR_PATH}" --operation matrix-addition --threads "${THREADS}" --output text < "${input}" > "${actual}"
+  rc=$?
+  set -e
+
+  if (( rc != 0 )); then
+    echo "Case ${id}: FAIL (program exited with ${rc})"
+    ((++fail))
+    continue
+  fi
+
+  # Normalize trailing newlines on both sides to avoid spurious diffs
+  if diff -u <(awk '1' "${expected}") <(awk '1' "${actual}") >/dev/null; then
+    echo "Case ${id}: PASS"
+    ((++pass))
+  else
+    echo "Case ${id}: FAIL"
+    diff -u <(awk '1' "${expected}") <(awk '1' "${actual}") || true
+    ((++fail))
+  fi
+
+done
+
+echo
+echo "SUMMARY ${pass}/${TOTAL} PASS"
+if (( fail == 0 )); then
+  echo "TESTS SUCCEEDED"
+  exit 0
+else
+  echo "TESTS FAILED"
+  exit 255
+fi

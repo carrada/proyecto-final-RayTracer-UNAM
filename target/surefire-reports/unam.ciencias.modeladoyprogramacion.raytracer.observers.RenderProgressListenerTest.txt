@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.observers.RenderProgressListenerTest
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s - in unam.ciencias.modeladoyprogramacion.raytracer.observers.RenderProgressListenerTest
+multipleTiles_canBeCompleted  Time elapsed: 0 s
+multipleUpdates_trackProgress  Time elapsed: 0 s
+progressUpdate_acceptsZeroPixels  Time elapsed: 0 s
+onTileCompleted_canBeCalled  Time elapsed: 0 s
+onRenderStart_canBeCalled  Time elapsed: 0 s
+onProgressUpdate_canBeCalled  Time elapsed: 0 s
+fullRenderLifecycle_worksCorrectly  Time elapsed: 0 s
+progressUpdate_acceptsFullProgress  Time elapsed: 0 s
+implementationCanBeCreated  Time elapsed: 0 s
+onRenderComplete_canBeCalled  Time elapsed: 0 s

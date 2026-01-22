@@ -1,0 +1,16 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.observers.ConsoleProgressListenerTest
+-------------------------------------------------------------------------------
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.184 s - in unam.ciencias.modeladoyprogramacion.raytracer.observers.ConsoleProgressListenerTest
+onProgressUpdate_handlesLargeNumbers  Time elapsed: 0.177 s
+onProgressUpdate_handlesZeroPixels  Time elapsed: 0.001 s
+onProgressUpdate_handlesSmallTotalPixels  Time elapsed: 0.001 s
+onTileCompleted_doesNotCrash  Time elapsed: 0.001 s
+onProgressUpdate_handlesIntermediateValues  Time elapsed: 0.001 s
+onProgressUpdate_printsAtTenPercentIntervals  Time elapsed: 0 s
+fullRenderCycle_printsExpectedMessages  Time elapsed: 0.001 s
+onRenderStart_printsStartMessage  Time elapsed: 0 s
+onProgressUpdate_doesNotRepeatSamePercentage  Time elapsed: 0.001 s
+onRenderComplete_printsFinalMessage  Time elapsed: 0 s
+onProgressUpdate_handlesFullProgress  Time elapsed: 0.001 s
+onProgressUpdate_handlesEdgeCasePercentages  Time elapsed: 0 s

@@ -1,0 +1,25 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.materials.PhongMaterialStrategyTest
+-------------------------------------------------------------------------------
+Tests run: 21, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s - in unam.ciencias.modeladoyprogramacion.raytracer.materials.PhongMaterialStrategyTest
+scatter_clampsColorValues  Time elapsed: 0 s
+getters_returnCorrectValues  Time elapsed: 0 s
+scatter_withDiamond  Time elapsed: 0 s
+constructor_throwsOnNullColor  Time elapsed: 0 s
+getRefractiveIndex_defaultsToOne  Time elapsed: 0 s
+constructor_withRefraction_createsValidMaterial  Time elapsed: 0 s
+scatter_handlesTotalInternalReflection  Time elapsed: 0.001 s
+constructor_clampsRefractiveIndex  Time elapsed: 0 s
+scatter_handlesZeroDepthWithRefraction  Time elapsed: 0.001 s
+getTransparency_defaultsToZero  Time elapsed: 0 s
+constructor_clampsCoefficientsToValidRange  Time elapsed: 0 s
+scatter_withWater  Time elapsed: 0.001 s
+scatter_stopsAtMaxDepth  Time elapsed: 0 s
+constructor_throwsOnNullId  Time elapsed: 0.001 s
+constructor_clampsTransparency  Time elapsed: 0.001 s
+scatter_returnsColorForBasicMaterial  Time elapsed: 0 s
+constructor_throwsOnEmptyId  Time elapsed: 0.002 s
+scatter_handlesReflection  Time elapsed: 0 s
+constructor_createsValidPhongMaterial  Time elapsed: 0 s
+scatter_handlesRefraction_enteringGlass  Time elapsed: 0.002 s
+scatter_handlesRefraction_exitingGlass  Time elapsed: 0 s

@@ -1,0 +1,15 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.SphereTest
+-------------------------------------------------------------------------------
+Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s - in unam.ciencias.modeladoyprogramacion.raytracer.SphereTest
+intersect_returnsEmptyWhenRayMisses  Time elapsed: 0 s
+getNormalAt_throwsOnNullPoint  Time elapsed: 0 s
+getNormalAt_returnsNormalizedVectorPointingOutward  Time elapsed: 0 s
+getNormalAt_worksForArbitraryPoint  Time elapsed: 0 s
+constructor_createsValidSphere  Time elapsed: 0.001 s
+constructor_throwsOnZeroRadius  Time elapsed: 0 s
+intersect_handlesRayOriginInsideSphere  Time elapsed: 0 s
+intersect_returnsDistanceWhenRayHits  Time elapsed: 0.001 s
+constructor_throwsOnNullCenter  Time elapsed: 0.001 s
+constructor_throwsOnNegativeRadius  Time elapsed: 0.003 s
+intersect_returnsEmptyWhenSphereBehindRay  Time elapsed: 0 s

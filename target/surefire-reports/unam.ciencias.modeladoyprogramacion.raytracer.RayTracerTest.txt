@@ -1,0 +1,16 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.RayTracerTest
+-------------------------------------------------------------------------------
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.875 s - in unam.ciencias.modeladoyprogramacion.raytracer.RayTracerTest
+addProgressListener_withValidListener_addsSuccessfully  Time elapsed: 0.798 s
+render_withMultipleThreads_producesCorrectImage  Time elapsed: 0.012 s
+constructor_throwsOnNullScene  Time elapsed: 0.003 s
+render_notifiesProgressListener_onStart  Time elapsed: 0.013 s
+render_notifiesProgressListener_onComplete  Time elapsed: 0.007 s
+render_withMultipleListeners_notifiesAll  Time elapsed: 0.011 s
+render_notifiesProgressListener_duringRendering  Time elapsed: 0.009 s
+addProgressListener_withNullListener_doesNotThrow  Time elapsed: 0.003 s
+removeProgressListener_removesListener  Time elapsed: 0.004 s
+render_producesImageWithCorrectDimensions  Time elapsed: 0.004 s
+constructor_acceptsThreadCount  Time elapsed: 0.003 s
+constructor_acceptsValidScene  Time elapsed: 0.002 s

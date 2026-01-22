@@ -1,0 +1,18 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.MaterialTest
+-------------------------------------------------------------------------------
+Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.018 s - in unam.ciencias.modeladoyprogramacion.raytracer.MaterialTest
+strategyConstructor_throwsOnNullId  Time elapsed: 0 s
+constructor_createsValidMaterial  Time elapsed: 0.008 s
+constructor_throwsOnNullColor  Time elapsed: 0.001 s
+strategyConstructor_throwsOnEmptyId  Time elapsed: 0.001 s
+strategyConstructor_createsValidMaterial  Time elapsed: 0 s
+constructor_clampsReflectivityToValidRange  Time elapsed: 0.001 s
+constructor_ensuresMinimumSpecularHardness  Time elapsed: 0 s
+getId_returnsCorrectId  Time elapsed: 0.001 s
+getColor_returnsCorrectColor  Time elapsed: 0 s
+constructor_clampsCoefficientsToValidRange  Time elapsed: 0 s
+toString_returnsFormattedString  Time elapsed: 0.001 s
+constructor_throwsOnNullId  Time elapsed: 0.001 s
+constructor_throwsOnEmptyId  Time elapsed: 0 s
+strategyConstructor_throwsOnNullStrategy  Time elapsed: 0.001 s

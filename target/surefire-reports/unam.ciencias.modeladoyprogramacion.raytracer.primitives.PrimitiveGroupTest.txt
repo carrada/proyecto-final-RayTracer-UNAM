@@ -1,0 +1,17 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.primitives.PrimitiveGroupTest
+-------------------------------------------------------------------------------
+Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s - in unam.ciencias.modeladoyprogramacion.raytracer.primitives.PrimitiveGroupTest
+getChildren_returnsDefensiveCopy  Time elapsed: 0 s
+add_allowsNestedGroups  Time elapsed: 0 s
+remove_removesPrimitive  Time elapsed: 0 s
+add_addsPrimitiveToGroup  Time elapsed: 0 s
+intersect_withNoHits_returnsEmpty  Time elapsed: 0.002 s
+intersect_withNestedGroups_findsIntersection  Time elapsed: 0.003 s
+intersect_withMultipleChildren_returnsClosestIntersection  Time elapsed: 0 s
+add_throwsOnNull  Time elapsed: 0 s
+getNormalAt_throwsUnsupportedOperationException  Time elapsed: 0 s
+intersect_withEmptyGroup_returnsEmpty  Time elapsed: 0.001 s
+intersect_withOneChild_returnsChildIntersection  Time elapsed: 0 s
+remove_doesNothingIfNotPresent  Time elapsed: 0 s
+constructor_createsEmptyGroup  Time elapsed: 0.001 s

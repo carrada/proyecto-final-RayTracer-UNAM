@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.Matrix3x3Test
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s - in unam.ciencias.modeladoyprogramacion.raytracer.Matrix3x3Test
+add_sumsMatrices  Time elapsed: 0 s
+identity_createsIdentityMatrix  Time elapsed: 0 s
+multiply_multipliesMatrixByVector  Time elapsed: 0 s
+rotationY_createsRotationMatrix  Time elapsed: 0 s
+rotationZ_createsRotationMatrix  Time elapsed: 0 s
+constructor_createsMatrixWithValues  Time elapsed: 0.001 s
+rotationX_createsRotationMatrix  Time elapsed: 0 s
+multiply_multipliesMatrices  Time elapsed: 0 s

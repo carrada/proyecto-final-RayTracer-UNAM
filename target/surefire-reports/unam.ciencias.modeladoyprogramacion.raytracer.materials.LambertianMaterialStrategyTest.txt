@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.materials.LambertianMaterialStrategyTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s - in unam.ciencias.modeladoyprogramacion.raytracer.materials.LambertianMaterialStrategyTest
+scatter_clampsColorValues  Time elapsed: 0 s
+constructor_createsValidMaterial  Time elapsed: 0 s
+getters_returnCorrectValues  Time elapsed: 0 s
+constructor_throwsOnNullColor  Time elapsed: 0.001 s
+constructor_usesDefaultAmbientWhenNull  Time elapsed: 0.001 s
+scatter_handlesZeroDiffuseCoefficient  Time elapsed: 0.001 s
+scatter_returnsValidColor  Time elapsed: 0 s
+constructor_clampsDiffuseCoefficient  Time elapsed: 0.001 s

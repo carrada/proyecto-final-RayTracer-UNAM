@@ -1,0 +1,23 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.lights.SurfaceLightTest
+-------------------------------------------------------------------------------
+Tests run: 19, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s - in unam.ciencias.modeladoyprogramacion.raytracer.lights.SurfaceLightTest
+getSamplePoints_returnsCorrectNumberOfSamples  Time elapsed: 0 s
+constructor_throwsOnNullColor  Time elapsed: 0 s
+getDirectionFromToSample_calculatesCorrectDirection  Time elapsed: 0 s
+toString_returnsReadableString  Time elapsed: 0 s
+getDirectionFrom_pointsTowardCenter  Time elapsed: 0 s
+constructor_throwsOnNullPosition  Time elapsed: 0 s
+getSamplePoints_distributesSamplesWithinBounds  Time elapsed: 0.003 s
+getDistanceFrom_throwsOnNullPoint  Time elapsed: 0.001 s
+getDistanceFromToSample_calculatesCorrectDistance  Time elapsed: 0 s
+getDistanceFrom_returnsCorrectDistance  Time elapsed: 0 s
+getDirectionFrom_throwsOnNullPoint  Time elapsed: 0 s
+constructor_throwsOnZeroSamples  Time elapsed: 0.001 s
+constructor_throwsOnNegativeIntensity  Time elapsed: 0.002 s
+constructor_normalizesNormal  Time elapsed: 0 s
+constructor_throwsOnNegativeHeight  Time elapsed: 0 s
+constructor_throwsOnZeroWidth  Time elapsed: 0.001 s
+getSamplePoints_isConsistent  Time elapsed: 0 s
+constructor_createsValidSurfaceLight  Time elapsed: 0 s
+constructor_throwsOnNullNormal  Time elapsed: 0.001 s

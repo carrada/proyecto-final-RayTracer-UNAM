@@ -1,0 +1,10 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.matrixaddition.MatrixAdditionTest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s - in unam.ciencias.modeladoyprogramacion.raytracer.matrixaddition.MatrixAdditionTest
+add_mismatchedDimensions_throws  Time elapsed: 0.001 s
+add_doubleMatrices_works  Time elapsed: 0.005 s
+add_emptyMatrices_returnsEmptyMatrix  Time elapsed: 0.004 s
+test_sumMatrix  Time elapsed: 0.001 s
+add_moreThreadsThanRows_producesCorrectResult  Time elapsed: 0.002 s
+add_nonDivisibleRowsByThreads_producesCorrectResult  Time elapsed: 0.001 s

@@ -1,0 +1,13 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.CameraTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s - in unam.ciencias.modeladoyprogramacion.raytracer.CameraTest
+constructor_throwsOnNullDirection  Time elapsed: 0 s
+constructor_createsValidCamera  Time elapsed: 0 s
+constructor_normalizesDirection  Time elapsed: 0 s
+constructor_throwsOnInvalidFov  Time elapsed: 0 s
+constructor_throwsOnNullPosition  Time elapsed: 0 s
+constructor_throwsOnNegativeFocalDistance  Time elapsed: 0.002 s
+constructor_normalizesUp  Time elapsed: 0 s
+getRight_returnsPerpendicularVector  Time elapsed: 0 s
+constructor_throwsOnNullUp  Time elapsed: 0 s

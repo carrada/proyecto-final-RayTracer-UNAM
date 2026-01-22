@@ -1,0 +1,11 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.SceneLoaderTest
+-------------------------------------------------------------------------------
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.164 s - in unam.ciencias.modeladoyprogramacion.raytracer.SceneLoaderTest
+loadFromString_usesDefaultValues  Time elapsed: 0.147 s
+loadFromString_parsesBox  Time elapsed: 0.003 s
+loadFromString_throwsOnInvalidJson  Time elapsed: 0.002 s
+loadFromString_parsesValidScene  Time elapsed: 0.001 s
+loadFromFile_parsesValidFile  Time elapsed: 0.006 s
+loadFromFile_throwsOnNonexistentFile  Time elapsed: 0.002 s
+loadFromString_parsesPlane  Time elapsed: 0.001 s

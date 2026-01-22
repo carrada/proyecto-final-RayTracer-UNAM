@@ -1,0 +1,11 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.materials.AmbientCalculatorTest
+-------------------------------------------------------------------------------
+Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s - in unam.ciencias.modeladoyprogramacion.raytracer.materials.AmbientCalculatorTest
+calculate_withNullAmbientLight_throwsException  Time elapsed: 0 s
+calculate_withBothNull_throwsException  Time elapsed: 0 s
+calculate_withZeroAmbientLight_returnsBlack  Time elapsed: 0 s
+calculate_withNullMaterialColor_throwsException  Time elapsed: 0.001 s
+calculate_withValidInputs_returnsComponentWiseProduct  Time elapsed: 0 s
+calculate_isCommutative  Time elapsed: 0 s
+calculate_withWhiteLight_returnsMaterialColor  Time elapsed: 0 s

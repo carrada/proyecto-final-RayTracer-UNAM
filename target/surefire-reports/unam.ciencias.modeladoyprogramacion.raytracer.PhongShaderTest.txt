@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.PhongShaderTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s - in unam.ciencias.modeladoyprogramacion.raytracer.PhongShaderTest
+shade_handlesShadows  Time elapsed: 0.008 s
+constructor_throwsOnNullScene  Time elapsed: 0.001 s
+shade_returnsBackgroundColorForNullIntersection  Time elapsed: 0.001 s
+constructor_usesDefaultAmbientWhenNull  Time elapsed: 0.001 s
+shade_returnsMagentaForMissingMaterial  Time elapsed: 0 s
+shade_calculatesDiffuseAndSpecular  Time elapsed: 0 s
+shade_clampsColorValues  Time elapsed: 0 s
+shade_calculatesAmbientComponent  Time elapsed: 0.001 s

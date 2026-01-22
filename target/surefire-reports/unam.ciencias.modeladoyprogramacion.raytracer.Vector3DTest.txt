@@ -1,0 +1,27 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.Vector3DTest
+-------------------------------------------------------------------------------
+Tests run: 23, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s - in unam.ciencias.modeladoyprogramacion.raytracer.Vector3DTest
+multiply_scalesVector  Time elapsed: 0 s
+cross_throwsOnNullVector  Time elapsed: 0 s
+getZ_returnsZComponent  Time elapsed: 0 s
+negate_invertsDirection  Time elapsed: 0 s
+cross_calculatesCrossProduct  Time elapsed: 0 s
+normalize_createsUnitVector  Time elapsed: 0 s
+getY_returnsYComponent  Time elapsed: 0 s
+magnitude_calculatesLength  Time elapsed: 0 s
+distance_throwsOnNullVector  Time elapsed: 0.002 s
+normalize_zeroVector_throws  Time elapsed: 0.002 s
+equals_returnsFalseForDifferentClass  Time elapsed: 0 s
+dot_throwsOnNullVector  Time elapsed: 0.001 s
+dot_calculatesDotProduct  Time elapsed: 0.001 s
+equals_returnsFalseForDifferentVectors  Time elapsed: 0 s
+getX_returnsXComponent  Time elapsed: 0 s
+add_sumsVectors  Time elapsed: 0.001 s
+equals_returnsFalseForNull  Time elapsed: 0 s
+subtract_throwsOnNullVector  Time elapsed: 0.001 s
+constructor_createsVector  Time elapsed: 0 s
+add_throwsOnNullVector  Time elapsed: 0.001 s
+hashCode_isConsistentForEqualVectors  Time elapsed: 0.001 s
+subtract_subtractsVectors  Time elapsed: 0 s
+equals_returnsTrueForEqualVectors  Time elapsed: 0 s

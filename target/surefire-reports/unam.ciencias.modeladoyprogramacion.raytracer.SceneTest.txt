@@ -1,0 +1,14 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.SceneTest
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s - in unam.ciencias.modeladoyprogramacion.raytracer.SceneTest
+builder_addsLights  Time elapsed: 0 s
+builder_setsCustomImageSize  Time elapsed: 0.001 s
+getPrimitives_returnsDefensiveCopy  Time elapsed: 0 s
+intersect_findsClosestPrimitive  Time elapsed: 0 s
+builder_addsMaterials  Time elapsed: 0 s
+builder_throwsWhenCameraMissing  Time elapsed: 0.001 s
+intersect_returnsEmptyWhenNoHit  Time elapsed: 0 s
+builder_addsPrimitives  Time elapsed: 0 s
+getMaterial_returnsEmptyForUnknownId  Time elapsed: 0.001 s
+builder_createsSceneWithDefaults  Time elapsed: 0 s

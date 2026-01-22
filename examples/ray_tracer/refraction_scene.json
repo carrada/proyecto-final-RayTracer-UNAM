@@ -1,0 +1,113 @@
+{
+  "camera": {
+    "position": [0, 2, 8],
+    "direction": [0, -0.2, -1],
+    "up": [0, 1, 0],
+    "fov": 60,
+    "focalDistance": 1.0
+  },
+  "lights": [
+    {
+      "type": "directional",
+      "direction": [-0.5, -1, -0.5],
+      "color": [1.0, 1.0, 1.0],
+      "intensity": 0.8
+    },
+    {
+      "type": "point",
+      "position": [3, 5, 3],
+      "color": [1.0, 0.9, 0.8],
+      "intensity": 0.6
+    }
+  ],
+  "materials": [
+    {
+      "id": "glass",
+      "color": [0.95, 0.95, 1.0],
+      "ka": 0.1,
+      "kd": 0.2,
+      "ks": 0.9,
+      "shininess": 100,
+      "reflectivity": 0.1,
+      "transparency": 0.9,
+      "refractiveIndex": 1.5
+    },
+    {
+      "id": "water",
+      "color": [0.7, 0.9, 1.0],
+      "ka": 0.1,
+      "kd": 0.3,
+      "ks": 0.6,
+      "shininess": 50,
+      "reflectivity": 0.05,
+      "transparency": 0.85,
+      "refractiveIndex": 1.33
+    },
+    {
+      "id": "diamond",
+      "color": [1.0, 1.0, 1.0],
+      "ka": 0.05,
+      "kd": 0.1,
+      "ks": 1.0,
+      "shininess": 150,
+      "reflectivity": 0.2,
+      "transparency": 0.95,
+      "refractiveIndex": 2.42
+    },
+    {
+      "id": "floor",
+      "color": [0.3, 0.3, 0.3],
+      "ka": 0.2,
+      "kd": 0.7,
+      "ks": 0.3,
+      "shininess": 20,
+      "reflectivity": 0.1
+    },
+    {
+      "id": "red",
+      "color": [0.8, 0.2, 0.2],
+      "ka": 0.2,
+      "kd": 0.6,
+      "ks": 0.4,
+      "shininess": 30,
+      "reflectivity": 0.0
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "center": [-2, 1.5, 0],
+      "radius": 1.5,
+      "materialId": "glass"
+    },
+    {
+      "type": "sphere",
+      "center": [2, 1.2, 1],
+      "radius": 1.2,
+      "materialId": "water"
+    },
+    {
+      "type": "sphere",
+      "center": [0, 0.8, 3],
+      "radius": 0.8,
+      "materialId": "diamond"
+    },
+    {
+      "type": "sphere",
+      "center": [0, 0.5, -2],
+      "radius": 0.5,
+      "materialId": "red"
+    },
+    {
+      "type": "plane",
+      "point": [0, 0, 0],
+      "normal": [0, 1, 0],
+      "materialId": "floor"
+    }
+  ],
+  "ambientColor": [0.1, 0.1, 0.15],
+  "backgroundColor": [0.05, 0.05, 0.1],
+  "imageWidth": 800,
+  "imageHeight": 600,
+  "maxDepth": 8
+}

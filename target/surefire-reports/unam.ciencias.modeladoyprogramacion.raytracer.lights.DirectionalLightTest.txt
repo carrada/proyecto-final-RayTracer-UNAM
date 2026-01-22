@@ -1,0 +1,16 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.lights.DirectionalLightTest
+-------------------------------------------------------------------------------
+Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 s - in unam.ciencias.modeladoyprogramacion.raytracer.lights.DirectionalLightTest
+constructor_throwsOnNullDirection  Time elapsed: 0.003 s
+getPosition_returnsNull  Time elapsed: 0.001 s
+constructor_normalizesDirection  Time elapsed: 0 s
+constructor_throwsOnNullColor  Time elapsed: 0.002 s
+diagonalDirection_normalizesCorrectly  Time elapsed: 0 s
+toString_returnsReadableString  Time elapsed: 0.004 s
+getDistanceFrom_throwsOnNullPoint  Time elapsed: 0.002 s
+getDistanceFrom_returnsInfinity  Time elapsed: 0.002 s
+getDirectionFrom_throwsOnNullPoint  Time elapsed: 0.002 s
+constructor_createsValidDirectionalLight  Time elapsed: 0.001 s
+constructor_throwsOnNegativeIntensity  Time elapsed: 0.002 s
+getDirectionFrom_returnsConstantDirection  Time elapsed: 0.003 s

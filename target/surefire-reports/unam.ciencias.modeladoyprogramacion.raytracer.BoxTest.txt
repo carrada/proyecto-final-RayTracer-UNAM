@@ -1,0 +1,18 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.BoxTest
+-------------------------------------------------------------------------------
+Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s - in unam.ciencias.modeladoyprogramacion.raytracer.BoxTest
+intersect_worksForDiagonalRay  Time elapsed: 0 s
+intersect_returnsEmptyWhenRayMisses  Time elapsed: 0 s
+getNormalAt_throwsOnNullPoint  Time elapsed: 0 s
+intersect_worksForAxisAlignedRays  Time elapsed: 0 s
+intersect_returnsEmptyWhenBoxBehindRay  Time elapsed: 0.001 s
+getNormalAt_returnsNormalizedVector  Time elapsed: 0.002 s
+intersect_returnsDistanceWhenRayHits  Time elapsed: 0 s
+constructor_throwsOnNullMin  Time elapsed: 0.001 s
+constructor_createsValidBox  Time elapsed: 0.001 s
+constructor_throwsOnNegativeHeight  Time elapsed: 0.001 s
+constructor_throwsOnZeroDepth  Time elapsed: 0.001 s
+constructor_throwsOnZeroWidth  Time elapsed: 0.001 s
+getNormalAt_returnsCorrectNormalForFace  Time elapsed: 0 s
+intersect_handlesRayOriginInsideBox  Time elapsed: 0 s

@@ -1,0 +1,15 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.materials.MetalMaterialStrategyTest
+-------------------------------------------------------------------------------
+Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s - in unam.ciencias.modeladoyprogramacion.raytracer.materials.MetalMaterialStrategyTest
+constructor_clampsFuzziness  Time elapsed: 0.005 s
+constructor_createsValidMaterial  Time elapsed: 0 s
+getters_returnCorrectValues  Time elapsed: 0 s
+constructor_throwsOnNullColor  Time elapsed: 0.001 s
+scatter_returnsBackgroundWhenMaxDepth  Time elapsed: 0.001 s
+constructor_clampsReflectivity  Time elapsed: 0 s
+scatter_worksWithZeroReflectivity  Time elapsed: 0.001 s
+scatter_noReflectionHit_returnsBackground  Time elapsed: 0.001 s
+scatter_withHighFuzziness_stillConverges  Time elapsed: 0.001 s
+scatter_withFuzziness_affectsReflection  Time elapsed: 0 s
+scatter_handlesReflection  Time elapsed: 0 s

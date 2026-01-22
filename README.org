@@ -1,0 +1,813 @@
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/xoEctVVN)
+#+title: Proyecto Final - Ray Tracer
+#+author: Alain Chevanier
+#+date: \today
+
+# #+STARTUP: latexpreview
+#+OPTIONS: tex:t
+
+#+HTML_HEAD: <style>
+#+HTML_HEAD: pre.src, pre.example { background-color: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.75em 1em; }
+#+HTML_HEAD: </style>
+
+#+LATEX_HEADER: % Estilos para bloques de código con minted
+#+LATEX_HEADER: \usepackage{xcolor}
+#+LATEX_HEADER: \usepackage{fvextra}
+#+LATEX_HEADER: \definecolor{codebg}{HTML}{F6F8FA}
+#+LATEX_HEADER: \definecolor{codeborder}{HTML}{D0D7DE}
+#+LATEX_HEADER: % Configuración global para minted (Org debe exportar con minted)
+#+LATEX_HEADER: \setminted{bgcolor=codebg, frame=single, framerule=0.6pt, framesep=6pt, rulecolor=\color{codeborder}, breaklines=true, autogobble=true}
+#+LATEX_HEADER: % Estilo similar para bloques de ejemplo (verbatim)
+#+LATEX_HEADER: \RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines, breakanywhere, frame=single, rulecolor=\color{codeborder}, framerule=0.6pt, framesep=6pt, bgcolor=codebg}
+
+$$ \newpage $$
+
+* Equipo de enseñanza
+- Ricchy Alaín Pérez Chevanier
+  [[mailto:alain.chevanier@ciencias.unam.mx][alain.chevanier@ciencias.unam.mx]]
+- Manuel Alcántara Juárez
+  [[mailto:manuelalcantara52@ciencias.unam.mx][manuelalcantara52@ciencias.unam.mx]]
+
+* Objetivo
+:PROPERTIES:
+:CUSTOM_ID: objetivo
+:END:
+Ejercitar todas las técnicas vistas en el curso de modelado y programación, clean code, SOLID Principles, unit tests, design patterns, architectural patterns, concurrencia y paralelismo, para implementar un /Ray Tracer/ simple que genere imágenes en formato /PNG/ a partir de escenas descritas en archivos /json/.
+
+El proyecto presentado tiene como finalidad que el estudiante enfrente proyectos de programación de alcance más amplio que requiera un nivel mayor de esfuerzo y organización. Este proyecto presenta las siguientes características:
+
+- Está pensado para ser implementado en un lenguaje de programación
+imperativo (ya sea procedural u orientado a objetos).
+- Se espera que el código del programa (sin tomar en cuenta comentarios,
+documentación y pruebas unitarias) sea de entre 1000 a 1500 líneas.
+
+* Desarrollo
+:PROPERTIES:
+:CUSTOM_ID: desarrollo
+:END:
+En esta práctica trabajarás con una base de código construida con Java
+17+ y Maven Wrapper, también proveemos pruebas unitarias escritas con la
+biblioteca *JUnit 5.11.0* que te darán retroalimentación de manera inmediata
+sobre el funcionamiento de tu implementación.
+
+Para ejecutar las pruebas necesitas ejecutar el siguiente comando:
+
+#+begin_example
+$ env ENV=github ./mvnw test
+#+end_example
+
+Para ejecutar las pruebas contenidas en una única clase de pruebas,
+utiliza un comando como el siguiente:
+
+#+begin_example
+$ ./mvnw -Dtest=MyClassTest test
+#+end_example
+
+Para ejecutar las pruebas creando un reporte de cobertura de código con JaCoCo
+utiliza el siguiente comando:
+
+#+begin_example
+$ ./mvnw clean test jacoco:report
+open target/site/jacoco/index.html
+#+end_example
+
+En el código que recibirás la clase *App* tiene un método *main* que
+puedes ejecutar como cualquier programa escrito en *Java*. Para eso
+primero tienes que empaquetar la aplicación y finalmente ejecutar el jar
+generado. Utiliza un comando como el que sigue:
+
+#+begin_example
+$ ./mvnw package
+... o saltando las pruebas unitarias
+$ ./mvnw package -DskipTests
+...
+...
+$ ./mvnw exec:java
+#+end_example
+
+* Configuración de los git hooks para formatear el código
+:PROPERTIES:
+:CUSTOM_ID: configuración-de-los-git-hooks-para-formatear-el-código
+:END:
+Antes de empezar a realizar commits que contenga tu solución tienes que
+configurar un módulo de git que te ayudará a formatear tu código.
+
+#+begin_example
+./mvnw git-code-format:install-hooks
+#+end_example
+
+* Entrega
+Deja todo el código con tu solución en la rama *main*, pues por omisión
+es esta rama la que compara *GitHub Classroom* contra la versión inicial
+del código mediante el *Pull Request* llamado *Feedback*, el cual
+nosotros vamos a revisar para evaluar tu entrega.
+
+Para verificar que tu código cumple con la especificación, en tu *Pull
+Request* debes de pasar las dos validaciones que hace *GitHub Actions*
+sobre el código, una de ellas verifica que pasas las pruebas
+automatizadas, y la otra que hayas formateado tu código con el plugin de
+maven.
+
+Además, no olvides marcar en classroom la tarea como entregada y en ella
+incluir el enlace hacia el *Pull Request* que contiene tu solución.
+
+La fecha de entrega de tu práctica va a ser el máximo entre la fecha en
+la que abriste el *Pull Request* y la fecha en la que hiciste el último
+push al repositorio con tu solución.
+
+Adicional para el proyecto final, considera los siguientes puntos:
+
+- Código fuente comentado.
+- Documento de diseño explicando las decisiones tomadas para la implementación.
+- Documentación de uso del programa.
+- Conjunto de pruebas unitarias para la validación básica de la funcionalidad de los componentes del programa. Las pruebas unitarias deben cubrir el 80% del código implementado; JaCoCo te provee un reporte de la cobertura actual.
+- Deberás de pasar las pruebas de integración que consideran la implementación correcta del algoritmo de ray tracing con planos, esferas y cajas, y soportando materiales que se reflejan. En cuanto a las fuentes de luz deben de soportar luces puntuales, luces direccionales y luces de superficie.
+- Que la entrega del proyecto sea un mes después de la fecha de presentación del mismo.
+- La realización del proyecto debe ser de manera individual o a lo más en parejas.
+
+* Descripción
+Un /ray tracer/ es un componente de software que sintetiza imágenes en 3D.
+Recibe como entrada la especificación de una escena, la cual está compuesta
+por diversos objetos tridimensionales compuestos por modelos, texturas y ma-
+teriales, así como la configuración de iluminación y posición de la cámara a partir de donde se visualiza la escena. La salida del programa es una imagen en archivo o memoria que representa la visualización de la cámara en la escena correspondiente.
+En la actualidad, los /ray tracers/ son de un uso intenso en la industria (ar-
+quitectura, diseño gráfico, publicidad, entretenimiento, videojuegos, entre otras) siendo el cine y los videojuegos, una aplicación muy socorrida para el uso de esta tecnología. Un ejemplo muy popular es Renderman[fn:1], el ray tracer implementado por Pixar Animation Studios[fn:2] el cual es el motor que ha producido diversos largometrajes animados para la compañía cinematográfica Disney[fn:3], Unreal Engine[fn:4] y Unity[fn:5].
+
+#+CAPTION: Ejemplo de imagen sintetizada con ray tracing Magnum C++ docs.
+#+NAME: fig:ray-tracing-example-2
+[[./assets/ray-tracing-example-2.png]]
+
+
+El auge de la tecnología de gráficos y la industria del entretenimiento han
+promovido el desarrollo de diversas implementaciones del algoritmo de ray tracing, algunas de las más populares son:
+
+*Software propietario:*
+
+- /Mental Ray/. La implementación usada por el popular sistema de producción y animación 3D /Maya/. Desarrollada por la compañía de software Autodesk[fn:6].
+- /Renderman/. Desarrollado por Pixar Animation Studios.
+
+*Software libre:*
+
+- /Blender internal render/. El motor de síntesis incluido en la suite de
+producción 3D Blender[fn:7].
+- /Yaf(a)ray/. http://www.yafaray.org/
+- /Lux Render/. http://www.luxrender.net/
+- /Indigo Renderer/. http://www.indigorenderer.com/joomla/
+
+
+[fn:1] https://renderman.pixar.com/
+[fn:2] https://www.pixar.com/
+[fn:3] https://disney.go.com/
+[fn:4] https://www.unrealengine.com/
+[fn:5] https://unity.com/
+[fn:6] https://www.autodesk.com/
+[fn:7] https://www.blender3d.org/
+
+* Arquitectura
+Un sistema de ray tracing está compuesto por los siguientes componentes:
+
++ *Módulo de lectura de datos*. Se encarga de cargar una escena a partir de un archivo. Inicializa y configura las estructuras de datos necesarias que consume el algoritmo de ray tracing para sintetizar una imagen.
++ *Subsistema de álgebra lineal*. Su función es proveer la funcionalidad necesaria para el álgebra de vectores y operaciones con matrices.
++ *El algoritmo de ray tracing*. Sintetiza la imagen.
++ *Materiales*. Representan el material del que está hecho cada objeto. Existen diversos modelos matemáticos para simular materiales y gracias a la arquitectura modular de un ray tracer es fácil implementarlos como plugins.
++ *Texturas*. Algoritmos que modifican el aspecto de la superficie de los objetos. Sirven para dar mayor realismo a los modelos tridimensionales. Al igual que los materiales, las texturas se pueden implementar como plugins. Existen dos grandes tipos de texturas:
+  - *Texturas procedimentales*. Desarrolladas 100% en código, utilizan procedimientos de software para simular diversos tipos de texturas.
+  - *Texturas de imagen*. Utilizan un archivo de imagen de entrada y la mapean a un modelo por medio de alguna transformación.
++ *Módulos de síntesis paralela y distribuida*. El algoritmo de ray tracing consume una gran cantidad de recursos (especialmente tiempo de procesador), a causa de esto, la mayoría de los sistemas modernos proporcionan soporte para realizar síntesis en paralelo (por medio de varios hilos de ejecución en un equipo de cómputo) y síntesis distribuida, es decir, coordinar diversos equipos de cómputo conectados por medio de una red para realizar el trabajo de síntesis de manera conjunta.
+
+* El algoritmo de Ray Tracing
+
+La técnica de /ray tracing/ para sintetizar imágenes es un intento burdo de simular a la naturaleza. Como ya sabemos, lo que vemos a través de nuestros ojos son rayos de luz que se originan de alguna fuente (ya sea el sol o alguna lámpara, por ejemplo) y rebotan en nuestro entorno. Al final, la imagen que vemos, son un conjunto de rayos de luz que al rebotar inciden en nuestro ojo.
+
+#+CAPTION: Diversos rayos de luz incidiendo en un espectador
+#+NAME: fig:ray-tracing-algorithm
+[[./assets/ray-tracing-algorithm.png]]
+
+Como se puede ver en la figura [[fig:ray-tracing-algorithm]] los rayos de luz que proceden de una fuente de luz pueden incidir directa o indirectamente hacia nuestro ojo, posiblemente tras rebotar varias veces antes de llegar. En la ilustración se muestran diversos tipos de rayos:
+
++ Rayos que rebotan en un objeto y posteriormente inciden en el ojo (rayo rojo).
++ Rayos que se reflejan en una superficie hasta incidir en el ojo (rayo azul).
++ Rayos que son desviados por la refracción al incidir en un objeto (rayo verde).
+
+El rayo amarillo representa la incidencia de algún rayo de luz que escapa a
+la escena actual. Este tipo de rayo es importante a la hora de implementar el
+algoritmo de síntesis por razones que serán obvias posteriormente.
+
+En la realidad, los rayos trazados en el esquema se originan en la fuente de luz y terminan en múltiples direcciones. En el caso de aquellos rayos que inciden en el espectador, la dirección de los rayos es hacia el espectador, sin embargo, para la imagen que queremos sintetizar sólo nos interesan aquellos rayos que inciden en el ojo, por lo que, podemos producir los rayos en sentido inverso: a partir del ojo hacia afuera y ver hacia donde se dirigen y calcular su iluminación total.
+
+El algoritmo de síntesis por /ray tracing/ intenta simular la ruta de los rayos de luz que inciden en una cámara virtual produciendo una cantidad finita de rayos los cuales /dispara/ de un origen (el punto focal del observador) y los hace viajar por el espacio tridimensional hasta intersectarlo con un objeto. La imagen resultante es el valor de color calculado por cada rayo que atraviesa por un plano (llamado /plano focal/).
+
+#+CAPTION: Diversos rayos generados a partir del punto focal y proyectados en el plano focal de la imagen
+#+NAME: fig:ray-tracing-algorithm-plano-focal
+[[./assets/ray-tracing-plano-focal.png]]
+
+De este modo, podemos idear el siguiente algoritmo para producir la imagen
+que quedaría plasmada en el plano focal:
+
+#+begin_src java -n 1
+foreach(var pixel : focalPlane) {
+  // Construir rayo que parte del foco (origin) y pasa por el píxel (plano focal)
+  Vector3D direction = pixel.position.subtract(origin).normalize();
+  Ray r = new Ray(origin, direction);
+
+  // Encontrar el primer objeto que intersecta el rayo
+  Primitive p = scene.intersectFirst(r);
+
+  // Determinar el color en el punto de intersección
+  ColorRGB c = shader.shade(p, scene, r); // si no hay p, usar color de fondo
+
+  // Guardar el color del píxel en la imagen
+  image.setPixel(pixel.x, pixel.y, c);
+}
+#+end_src
+
+Este algoritmo representa la idea central del algoritmo de /ray tracing/. El tipo de datos ~Ray~ representa una semirrecta o rayo, la cual se puede ver como una recta paramétrica en 3D con un parámetro \(t\) no negativo (para que sea semirrecta). El tipo de dato ~Primitive~ representa un objeto en el espacio tridimensional, el cual debe implementar el método ~intersect~ el cual devuelve la distancia de una recta paramétrica y el punto más cercano a ella. La función ~intersectFirst~ devuelve el objeto intersectado más cercano para el rayo dado, y a partir de ese objeto calculamos el color del píxel de la imagen.
+
+Como veremos más adelante, el procedimiento del cálculo del color del píxel involucra muchos algoritmos intermedios los cuales pueden involucrar fenómenos ópticos como:
+
++ *Reflexión*. Cuando un rayo rebota en una superficie especular (como un espejo).
++ *Refracción*. Un rayo es desviado por cambiar de medio (objetos de cristal).
++ *Textura*. Si un objeto tiene asociada una textura su color es afectado por la forma de la textura.
++ *Iluminación*. Dependiendo de la configuración de las fuentes de luz en la escena, es como se debe “colorear” el objeto (ya sea número de fuentes, localización y color de las mismas)
+
+* Elementos soportados en el proyecto
+Por razones de tiempo y complejidad del proyecto, limitaremos la implementación del algoritmo de /ray tracing/ a los siguientes elementos[fn:8]:
+
+- *Objetos primitivos*:
+  - Paralelepípedos coplanares a los planos \( X - Y \), \( Y - Z \) y \( X - Z \).
+  - Esferas.
+  - Planos infinitos.
+- *Elementos ópticos*:
+  - Reflexión.
+  - Modelo de iluminación de /Phong/. Sombreado difuso y sombreado especular.
+- *Sobremuestreo* (/supersampling/).
+- *Fuentes de luz*:
+  - Luz unidireccional con sombreado duro.
+  - Luz puntual con sombreado duro.
+  - Luz de superficie con sombreado suave basado en muestreo.
+
+[fn:8] Todos los elementos descritos se explican a detalle posteriormente
+
+* Etapa 1: Construcción del subsistema de álgebra lineal (0.5 puntos)
+Antes de iniciar el desarrollo del algoritmo de síntesis, lo primero que debemos implementar es el subsistema de álgebra lineal. Este sistema se encarga de realizar todos los cálculos necesarios en \( \mathbb{R}^{3} \) que requeriremos a lo largo del desarrollo del proyecto.
+
+El subsistema de álgebra lineal debe proporcionar las siguientes operaciones (todas en \( \mathbb{R}^{3} \)):
+
+- *Aritmética de vectores*: Suma, diferencia, producto escalar, producto punto y producto cruz.
+- *Matrices de transformación* (de \( 3 x 3 \)): Suma y producto de matrices (matriz por matriz y matriz por vector). Matrices de cambio de coordenadas (rotación y traslación).
+
+Si bien es un módulo muy sencillo de implementar, es muy importante que
+esté bien probado para evitar problemas a futuro. No es necesario implementar
+ninguna otra operación además de las mencionadas en el listado anterior.
+
+* Etapa 2: Definición de los objetos geométricos primitivos y cómo calcular sus intersecciones (1 punto)
+
+Antes de implementar el algoritmo de síntesis, es necesario definir los objetos primitivos que soportará nuestro ray tracer y cómo calcular la intersección de una recta paramétrica con cada uno de ellos. A continuación se describen los objetos primitivos que se deben soportar y los atributos necesarios para definirlos:
+
+- *Rectas paramétricas* (/Rayos/).
+  - Representadas por un punto de origen y un vector dirección (ambos en \( \mathbb{R}^{3} \)).
+- *Planos*.
+  - Vector posición y vector normal. La descripción más popular de un plano. Ambos son vectores en \( \mathbb{R}^{3} \).
+- *Esferas*.
+  - Vector posición. Ubicación del centro de la esfera (vector en \( \mathbb{R}^{3} \)).
+  - Radio de la esfera. Representado como un valor real.
+- *Paralelepípedos*.
+  - Posición de alguna esquina. Representada como un vector en \( \mathbb{R}^{3} \).
+  - Ancho, alto y profundidad. Representados por un valor real para cada propiedad. Se puede ver como un vector en \( \mathbb{R}^{3} \) que representa el desplazamiento del vector posición hacia la esquina opuesta del paralelepípedo.
+
+** Cálculo de intersección para primitivos sencillos
+Para efectos del proyecto mostraremos la representación de diversos primitivos geométricos utilizando vectores y valores escalares, así como la forma de calcular la intersección de un rayo (recta paramétrica) con los tres primitivos soportados: esferas, planos infinitos y paralelepípedos alineados a los ejes coordenados (cajas):
+
+*** Rayos
+Un rayo se puede definir como una recta paramétrica en \( \mathbb{R}^{3} \) de la forma:
+
+\[ x = o + td \]
+
+Donde \( o \) representa el punto de origen del rayo, \( d \) el vector dirección y \( t \) el parámetro de la recta. Es importante que \( t \) sea un número real no negativo para que la recta sea una semirrecta o rayo.
+
+*** Planos infinitos
+Usando la definición punto–normal del plano, definimos la ecuación del plano como:
+
+\[ n \cdot ( x - p ) = 0 \]
+
+Donde \( n \) representa un vector normal al plano, \( p \) un punto del plano y \( x \) la variable independiente de la ecuación. Para calcular la intersección de un plano con una recta paramétrica \( o + td \) sustituimos a \( x \) por la definición de la recta, quedando entonces:
+
+\[ n \cdot ( ( o + td ) - p ) = 0 \]
+
+Despejando \( t \) obtenemos:
+
+\[ n \cdot ( o - p ) + t( n \cdot d ) = 0 \]
+
+\[ t = \frac{ n \cdot ( p - o ) }{ n \cdot d } \]
+
+Es importante que, en caso de que \( t \) sea negativa, se devuelva un valor bandera donde se especifique que el plano no fue intersectado, ya que geométricamente una \( t \) negativa representa objetos que se encuentran atrás del observador, por lo que no queremos que aparezcan en la escena.
+
+Para calcular el vector normal a la superficie del plano, basta con devolver \( n \).
+*** Esferas
+Si definimos la esfera como el conjunto de puntos que equidistan \( R \) unidades del centro, podemos proponer la ecuación:
+
+\[ || x  - o ||^{2} - R^{2} = 0 \]
+
+Donde \( o \) representa el centro de la esfera, \( R \) su radio y \( x \) un punto en la superficie de la esfera. Para calcular la intersección de una recta paramétrica \( p + td \) con la esfera, sustituimos a \( x \) por la definición de la recta, quedando:
+
+\[ || ( p + td ) - o ||^{2} - R^{2} = 0 \]
+
+\[ ( p - o + td ) \cdot ( p - o + td ) - R^{2} = 0 \]
+
+\[ ( td ) \cdot ( td ) + 2t d \cdot ( p - o ) + ( p - o ) \cdot ( p - o ) - R^{2} = 0 \]
+
+\[ t^{2} ( d \cdot d ) + 2t d \cdot ( p - o ) + ( p - o ) \cdot ( p - o ) - R^{2} = 0 \]
+
+Al final, tenemos una ecuación cuadrática en \( t \). Como \( p - o \) es un vector constante, podemos sustituirlo con \( c \) y obtenemos el siguiente polinomio:
+
+\[ t^{2} ( d \cdot d ) + 2t ( d \cdot c ) + ( c \cdot c - R^{2} ) = 0 \]
+
+Al igual que en los primitivos anteriores, la solución del problema de la intersección con la esfera es el valor positivo más pequeño de la solución de la ecuación cuadrática.
+
+Para obtener el vector normal a una esfera, basta con usar el hecho de
+que todo vector normal a la superficie de una esfera va en dirección al
+centro; por lo que, dado \( v \), un vector normal a la superficie de la esfera con dirección a \( v \) sería:
+
+\[ n = \frac{ v - o }{ || v - o || } \]
+
+*** Paralelepípedos
+Decidimos escoger paralelepípedos alineados a los ejes coordenados, ya que existe un truco sencillo para calcular su intersección con un rayo: si suponemos que un paralelepípedo alineado a los ejes es en realidad la intersección de tres secciones de cada eje (se ven como regiones acotadas por dos planos), podemos calcular el punto de intersección realizando la intersección de todos los intervalos o secciones.
+
+Si la intersección de los intervalos es vacía, significa que el rayo no toca el paralelepípedo. En caso contrario, debemos calcular cuál es el intervalo de intersección y, finalmente, el punto en \( \mathbb{R}^{3} \) donde inicia el intervalo, el cual será el punto de intersección más cercano. Para realizar este cálculo debemos proceder coordenada a coordenada. Si tenemos una caja con esquinas \( ( a_{1}, a_{2}, a_{3} ) \), \( ( b_{1} , b_{2} , b_{3} ) \), debemos intersectar una recta paramétrica \( o + t \cdot d \) en cada coordenada. En el caso del eje \( x \) la condición es \( t \in [ a_{1} , b_{1} ] \). Sin embargo, si \( a_{1} > b_{1} \), el valor de \( t \) va decreciendo, situación que complica los cálculos, por lo que lo más conveniente es definir los intervalos de la siguiente forma:
+
+\[ t \in [ \min( a_{i} , b_{i} ) , \max( a_{i} , b_{i} ) ] \mid  i \in \{ 1, 2, 3 \} \]
+
+Finalmente, basta con calcular la intersección de todos los intervalos y devolver la cota inferior del mismo. Al igual que los planos, siempre debemos validar que el valor de \( t \) sea positivo.
+
+#+CAPTION: La región acotada por la intersección de dos intervalos de cada eje representa un rectángulo alineado a los ejes coordenados. La extensión al espacio tridimensional es intersectando tres intervalos.
+#+NAME: fig:interseccion-intervalos
+[[./assets/ray-tracing-interseccion-de-cajas.png]]
+
+Para calcular el vector normal de la superficie del plano, necesitamos definir en qué cara intersecta el rayo al plano y devolver un vector normal a dicha cara. Esto se logra fácilmente guardando la pista de a qué coordenada pertenecía la cota inferior del intervalo de intersección.
+
+* Etapa 3: Definición de ~Scene~ y construcción del módulo de carga desde archivos /JSON/ (1.5 puntos)
+Para implementar el componente que sintetiza imágenes, antes debemos tomar en cuenta el módulo que lee los datos de archivo y arma la estructura de datos que recibirá el ray tracer para sintetizar la imagen. Si bien existen diversas formas para codificar los datos de una escena en un archivo, por simplicidad, utilizaremos un formato de archivo de texto bien conocido: /JSON/. Representaremos la escena a sintetizar como un documento /JSON/ que especificará de manera precisa la escena que recibirá el algoritmo de /ray tracing/.
+
+En el archivo /JSON/ deberemos incluir los siguientes datos:
+
++ *Datos generales de la escena*:
+  - Tamaño de la imagen a sintetizar (largo por ancho en píxeles).
+  - Número de muestras a tomar por píxel. Un valor entero positivo.
+  - Posición y dirección de la cámara. Tres vectores en \( \mathbb{R}^{3} \): uno que representa la posición, un vector unitario que representa la dirección de la cámara, un vector perpendicular a la dirección que representa el "arriba" de la cámara y el un número de punto flotante que representa el ángulo de visión horizontal de la cámara en grados.
+  - Número de rebotes de los rayos a trazar (para implementar reflexión). Un valor entero.
+  - Distancia focal de la cámara. Un valor real positivo que representa la distancia entre el punto focal y el plano focal.
+  - Ángulo de visión de la cámara. Un valor real en grados que representa el ángulo de visión horizontal de la cámara.
++ *Definiciones de los materiales usados en la escena*:
+  - Color. Como un vector ~RGB~ ~(Red, Green, Blue)~[fn:9] representado por aritmética de punto flotante acotada en el intervalo \( [0, 1] \). Por ejemplo, un tono de gris sería: \( <0.5, 0.5, 0.5> \) y el color blanco sería representado por \( <1.0, 1.0, 1.0> \).
+  - Coeficiente de sombreado difuso. Un valor real en el intervalo \( [0, 1] \). Representa qué tanta luz difusa refleja el objeto.
+  - Coeficiente de sombreado especular. Un valor real en el intervalo \( [0, 1] \). Representa qué tan "pulida" está la superficie del objeto.
+  - Dureza especular. Un valor entero en el intervalo \( [20, 150] \). Representa qué tanta difusión tiene el sombreado especular.
+  - Reflectividad. Un valor real en el intervalo \( [0, 1] \). Representa qué tanta luz se refleja en este material al igual que en un espejo.
++ *Definiciones de fuentes de luz*:
+  - Para todos los tipos de fuentes de luz:
+    - Color de la fuente de luz. Como vector RGB.
+    - Intensidad. Un coeficiente real que representa la intensidad de la fuente de luz.
+  - Para la /luz unidireccional/:
+    - Vector dirección. Un vector en \( \mathbb{R}^{3} \) que representa la dirección de la luz.
+  - Para la /luz puntual/:
+    - Vector posición. Un vector en \( \mathbb{R}^{3} \) que representa la posición de la fuente de luz.
+  - Para la /luz de superficie/:
+    - Tamaño. Un valor real que representa el tamaño de la fuente de luz. La fuente de luz de superficie se modelará como un cuadrado en el espacio con la longitud por lado especificada en este parámetro.
+    - Número de muestras a tomar. Un valor entero que representa cuántas muestras se tomarán por cada primitivo para calcular la sombra que proyecta sobre otro objeto.
+
+Una propuesta para un archivo de entrada JSON que almacene estos datos podría ser:
+
+#+begin_src json -n 1
+{
+  "imageWidth": 800,
+  "imageHeight": 600,
+  "focalDistance": 5.0,
+  "samplesPerPixel": 4,
+  "camera": {
+    "position": [0.0, 0.0, -5.0],
+    "direction": [0.0, 0.0, 1.0],
+    "normalUp": [0.0, 1.0, 0.0],
+    "angleOfVision": 60.0
+  },
+  "rayMaxBounces": 3,
+  "materials": [
+    {
+      "id": "mat1",
+      "color": [1.0, 0.0, 0.0],
+      "diffuseCoefficient": 0.8,
+      "specularCoefficient": 0.5,
+      "specularHardness": 50,
+      "reflectivity": 0.3
+    },
+    {
+      "id": "mat2",
+      "color": [0.0, 1.0, 0.0],
+      "diffuseCoefficient": 0.7,
+      "specularCoefficient": 0.6,
+      "specularHardness": 100,
+      "reflectivity": 0.0
+    }
+  ],
+  "lights": [
+    {
+      "type": "point",
+      "color": [1.0, 1.0, 1.0],
+      "intensity": 1.0,
+      "position": [10.0, 10.0, -10.0]
+    },
+    {
+      "type": "surface",
+      "color": [1.0, 1.0, 1.0],
+      "position": [5.0, 10.0, 0.0],
+      "intensity": 0.5,
+      "direction": [-1.0, -1.0, 0.0],
+      "samples": 4,
+      "size": 2.0
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "Sphere1",
+      "materialId": "mat1",
+      "position": [0.0, 1.0, 3.0],
+      "radius": 1.0
+    },
+    {
+      "type": "plane",
+      "name": "GroundPlane",
+      "materialId": "mat1",
+      "position": [0.0, 0.0, 0.0],
+      "normal": [0.0, 1.0, 0.0]
+    },
+    {
+      "type": "box",
+      "name": "Box1",
+      "materialId": "mat1",
+      "position": [-2.0, 0.0, 2.0],
+      "width": 1.0,
+      "height": 2.0,
+      "depth": 1.0
+    }
+  ]
+}
+#+end_src
+
+Ya que conocemos los datos que necesitamos y cómo representarlos en disco,
+podemos presentar qué estructuras de datos necesitamos para implementar el
+sistema de /ray tracing/:
+
+- *Clase Vector*. Un vector en \( \mathbb{R}^{3} \). Dicha clase debe estar implementada en el subsistema de álgebra lineal.
+- *Clase Color*. Es una tupla de tres números de punto flotante con valores acotados en el intervalo \( [0, 1] \) para cada entrada. Adicionalmente, debemos implementar la operación blend que mezcla dos colores. Esto se consigue multiplicando entrada a entrada ambos colores y devolviendo el resultado. Es decir, si \( C = (r_{1}, g_{1}, b_{1}) \) y  \( D = (r_{2}, g_{2}, b_{2}) \), entonces: \[ blend(C,D) = (r_{1}r_{2}, g_{1}g_{2}, b_{1}b_{2}) \]
+- *Clases contenedoras*. Deben almacenar los atributos de los diversos primitivos y fuentes de luz.
+- *Clase escena*. La estructura de datos que será la entrada del ray tracer. Esta clase deberá contener los atributos generales de la escena a sintetizar y tres colecciones: una para /materiales/, otra para /primitivos/ y otra para /fuentes de luz/.
+
+[fn:9] Rojo, Verde y Azul, los colores primarios de la luz. Mezclando tres fuentes de luz de estos colores es posible producir luz de cualquier color del espectro visible.
+
+* Etapa 4: Implementación del algoritmo de ray tracing (2 puntos)
+Después de leer la entrada y construir las estructuras de datos necesarias, estamos en condiciones de implementar el algoritmo de /ray tracing/. Como se menciona anteriormente, cada píxel de la imagen se calcula a partir del valor de color devuelto al intersectar cada recta paramétrica con el primitivo más cercano.
+
+En una primera aproximación, podemos ignorar temporalmente la posición y dirección de la cámara y anclar nuestro espectador en \( ( 0 , 0 , -5 ) \) y ubicar el plano focal en \( ( x , y , 0 ) \) con \( x \in [ -4 , 4 ] \) y \( y \in [ -3 , 3 ] \) para tener una relación de aspecto *4:3*. En una etapa posterior podremos ajustar el algoritmo para que pueda soportar posición y dirección de la cámara, así como ajustar automáticamente la relación de aspecto en base a la resolución especificada en el /JSON/. Para esta implementación, es importante que los archivos de entrada mantengan una resolución con relación de aspecto *4:3*; de lo contrario, la imagen resultante se verá mal proporcionada.
+
+Posteriormente, para armar los rayos a trazar, debemos construir una partición regular del plano focal cuyos puntos representan la posición por donde pasa cada rayo, por lo que cada rayo será de la forma:
+
+\[ \LARGE \left[ ( 0 , 0 , -5 ) , \frac{d}{ || d || } \right] \]
+
+donde \( d \) es el vector que va del punto focal al punto en el plano focal, es decir, \( d = (x_{p}, y_{p}, 0) - (0, 0, -5) \); \( (x_{p}, y_{p}, 0) \) es un punto en el plano focal y \( (0, 0, -5) \) es el punto focal.
+
+Un método de Java para realizar este algoritmo sería:
+
+#+begin_src java -n 1
+Ray buildRay(int pixelX, int pixelY, int width, int height) {
+    Vector3D origin = new Vector3D(0, 0, -5);
+    float x_p = mapToFocalPlaneX(pixelX, width);
+    float y_p = mapToFocalPlaneY(pixelY, height);
+    Vector3D direction = new Vector3D(x_p, y_p, 0).subtract(origin);
+    return new Ray(origin, direction.normalize());
+}
+
+float mapToFocalPlaneX(int x, int width) {
+    // x in [0, width-1]
+    // mapea x a [-4 + 0.5/width, 4 -.5/width]
+    return ((x + .5f) * 8f / width) - 4f;
+}
+
+float mapToFocalPlaneY(int y, int height) {
+    // y in [0, height-1]
+    // mapea y a [-3 + .5/height, 3 - .5/height]
+    return ((y + .5f) * 6f / height) - 3f;
+}
+#+end_src
+
+#+CAPTION: Anclando el plano focal en \( XY \) y el foco en \( (0,0,−5) \). Las líneas punteadas representan la dirección de los rayos que pasan por las esquinas del plano focal.
+#+NAME: fig:ray-tracing-algorithm-foco-plano-focal
+[[./assets/ray-tracing-foco-plano-focal.png]]
+
+#+CAPTION: Visión general del algoritmo de ray tracing
+#+NAME: fig:ray-tracing-vision
+[[./assets/ray-tracing-vision.png]]
+
+Posteriormente, al ir procesando cada rayo, debemos encontrar la intersección más cercana con los objetos de la escena y calcular el color del punto de intersección. Utilizando un lenguaje orientado a objetos, es fácil generalizar este proceso por medio de herencia de clases, definiendo una clase abstracta que represente cualquier objeto de la escena:
+
+#+begin_src java -n 1
+@Getter
+public abstract class Primitive {
+    protected Material material;
+    protected String name;
+
+    public Primitive(Material material, String name) {
+        this.material = material;
+        this.name = name;
+    }
+
+    // Devuelve la distancia t a la intersección más cercana del rayo con el primitivo
+    // u Optional.empty si no hay intersección
+    public abstract Optional<Float> intersect(Ray ray);
+
+    // Devuelve la normal en el punto de intersección
+    public abstract Vector3D getNormalAt(Vector3D point);
+}
+#+end_src
+
+Para ejemplificar una clase que extiende a ~Primitive~ mostramos la clase
+Sphere que representa una esfera en el espacio.
+
+#+begin_src java -n 1
+@Builder
+@EqualsAndHashCode
+@ToString
+@Getter
+public class Sphere extends Primitive {
+    private Vector3D center;
+    private float radius;
+
+    @Override
+    public Vector3D getNormalAt(Vector3D point) {
+        return point.subtract(center).normalize();
+    }
+
+    @Override
+    public Optional<Float> intersect(Ray ray) {
+        // calcula el valor de t si es que existe...
+        return Optional.empty();
+    }
+}
+#+end_src
+
+Para calcular la intersección más cercana, basta con barrer todos los primitivos y encontrar aquel cuyo método ~intersect~ devuelve el valor más pequeño.
+
+Una vez encontrado el primitivo con la intersección más cercana al rayo dado, debemos calcular su valor de color. Esta es la parte más importante del algoritmo de /ray tracing/ ya que aquí se implementan los fenómenos ópticos que suceden en la naturaleza. En esta etapa del desarrollo calcularemos exclusivamente el color y sombreado de la superficie del primitivo. Posteriormente calcularemos reflexión, refracción y sombras.
+
+** Iluminación
+Para calcular el color del punto de intersección del /rayo/ con el /primitivo/ más cercano, necesitamos un modelo de iluminación que describa de manera precisa la intensidad de la luz que se refleja en ese punto. El modelo más sencillo es el modelo de /Lambert/ y  /Phong/[fn:10] el cual consiste en dos elementos de iluminación:
+
+#+CAPTION: El shader de Phong
+#+NAME: fig:ray-tracing-shader-phong
+[[./assets/ray-tracing-shader-phong.png]]
+
+
+[fn:10] El modelo de Phong fue propuesto por Bui Tuong Phong en 1975 en su tesis doctoral "Illumination for Computer Generated Pictures".
+
+*** Luz Difusa
+Representa la cantidad de luz reflejada por el objeto en cada punto de su superficie.
+
+#+CAPTION: Cantidad de área iluminada según el modelo de Lambert depende del ángulo de incidencia de la luz
+#+NAME: fig:lambert-shading-intuition
+[[./assets/lambert-shading-intuition.png]]
+
+#+CAPTION: Cálculo matemático de la luz difusa según el modelo de Lambert
+[[./assets/lambert-shading-math.jpg]]
+
+Definimos la intensidad de la luz difusa \( I_{d} \) como:
+
+\[ \LARGE I_{d} = L_{c} \cdot k_{d} \cdot \max(0, N \cdot L) \]
+
+Donde:
+- \( I_{d} \) es la intensidad de la luz difusa reflejada en el punto.
+- \( L_{c} \) es la intensidad (color, usualmente blanco) de la fuente de luz.
+- \( k_{d} \) es el coeficiente de sombreado  del material.
+- \( L \) es el vector unitario que va del punto de intersección hacia la fuente de luz.
+- \( N \) es el vector normal a la superficie en el punto de intersección.
+
+*** Luz Especular
+Representa la luz que "rebota" directamente al punto focal del espectador; se ven como partes brillantes.
+
+#+CAPTION: Iluminación según el modelo de Phong
+[[./assets/phong-illumination.png]]
+
+Donde:
+- \( V \) es el vector unitario que va del punto de intersección hacia el punto focal del espectador.
+- \( L \) es el vector unitario que va del punto de intersección hacia la fuente de luz.
+- \( N \) es el vector normal a la superficie en el punto de intersección.
+- \( R \) es el vector de reflexión de \( L \) respecto a \( N \).
+- \( \beta \) es el ángulo entre \( R \) y \( V \). Como \( R \) y \( V \) son vectores unitarios, entonces \( \cos(\beta) = R \cdot V \).
+
+Entonces definimos la intensidad de la luz especular \( I_{s} \) como:
+
+\[ \LARGE I_{s} = L_{c} \cdot k_{s} \cdot ( v \cdot R )^{m} \]
+
+Donde:
+- \( L_{c} \) es la intensidad (color, usualmente blanco) de la fuente de luz.
+- \( k_{s} \) es el coeficiente de luz especular del material.
+- \( m \) es el atributo de dureza especular del material.
+
+** Color del píxel
+Una vez calculadas las componentes difusa y especular de luz, podemos calcular el color final del píxel \( P_{c} \) como una combinación del color \( C \) del material y las componentes de iluminación:
+
+\[ \LARGE P_{c} = C + I_{d} + I_{s} \]
+
+* Etapa 5: Sombras (1 punto)
+Al finalizar las etapas anteriores del proyecto deberíamos tener una versión sencilla pero funcional del ray tracer. Las siguientes etapas representan características avanzadas que elevan el realismo y calidad de imagen que sintetiza el proyecto.
+
+El procedimiento requerido para calcular sombras se basa en la construcción de un rayo secundario[fn:11] que parte del punto de intersección del primitivo con un rayo primario[fn:12] y va en dirección a la fuente de luz a evaluar si está ocluida o no por algún otro objeto.
+La idea para calcular las sombras es muy sencilla como se muestra en la
+siguiente imagen:
+
+#+CAPTION: Cálculo de sombras por oclusión de la luz
+#+NAME: fig:ray-tracing-shadow-calculation
+[[./assets/ray-tracing-regular-shadows.png]]
+
+Si el rayo secundario intersecta algún otro primitivo antes de llegar a la fuente de luz, entonces el punto de intersección original se encuentra en sombra respecto a esa fuente de luz y, por lo tanto, no se debe agregar la contribución de iluminación difusa y especular de esa fuente de luz al color final del píxel. A continuación se muestra un segmento de código que ejemplifica este procedimiento:
+
+#+begin_src java -n 1
+float computeShadow(Light light, Vector3D intersectionPoint, Vector3D lightDirection, Scene scene) {
+    Ray shadowRay = new Ray(intersectionPoint, lightDirection);
+    for (Primitive primitive : scene.getPrimitives()) {
+        Optional<Float> t = primitive.intersect(shadowRay);
+        if (t.isPresent()
+            && t.get() >= 0.0f
+            && t.get() < lightDistance) {
+            // Hay un objeto entre el punto de intersección y la luz
+            return 0.0f; // En sombra
+        }
+    }
+    return 1.0f; // No en sombra
+}
+#+end_src
+
+Una vez calculado el valor de sombra, modificamos la ecuación de iluminación de la siguiente forma:
+
+\[ \LARGE P_{c} = C + s \cdot ( I_{d} + I_{s} ) \]
+
+Donde \( s \) es el valor de sombra calculado (0 si está en sombra, 1 si no lo está).
+
+#+CAPTION: Resultado final con sombras
+#+NAME: fig:ray-tracing-shadow-result
+[[./assets/ray-tracing-regular-shadow-example.png]]
+
+[fn:11] Rayo secundario: rayo que no parte del punto focal, sino de un punto de intersección en la escena.
+[fn:12] Rayo primario: rayo que parte del punto focal y atraviesa el plano focal para intersectar la escena.
+
+* Etapa 6: Reflexión (1 punto)
+El fenómeno de reflexión es aquel que percibimos cuando observamos una imagen reflejada en un espejo. El efecto producido es la reproducción de los rayos de luz que inciden sobre él respecto a cierto ángulo, como se muestra posteriormente.
+
+Al igual que el cálculo de sombras, la reflexión se calcula a partir de la producción de rayos secundarios, sin embargo, el reflejar un rayo en una superficie no necesariamente se produce solo un rayo, sino que se pueden producir varios rayos dependiendo del número de rebotes que especifiquemos en el algoritmo.
+
+El procedimiento para calcular el color aportado por la reflexión de un rayo se realiza de manera recursiva donde la condición de parada es un número límite de rebotes de un rayo a través de diversas superficies reflejantes ubicadas en la escena a sintetizar. Para calcular la reflexión seguiremos los siguientes pasos:
+
+Sean \( I \) el vector dirección del rayo incidente, \( N \) la normal en el punto de intersección, \( P \) el punto de intersección, y \( R \) el vector de reflexión. /Nota: todos los vectores deben ser unitarios/.
+
+1. Primero calculamos el vector de reflexión \( R \) utilizando la siguiente fórmula:
+
+   \[ \LARGE R = I - 2 ( I \cdot N ) N \]
+
+   #+CAPTION: Ley de reflexión de rayos
+    #+NAME: fig:ray-tracing-reflection-law
+   [[./assets/ray-tracing-reflection-law.png]]
+
+2. Luego creamos un rayo secundario \( L(t)\)  que parte del punto de intersección en la dirección del vector de reflexión \( R \).
+
+   \[ \LARGE L(t) = P + R \cdot t \]
+
+3. Finalmente, aplicamos el algoritmo de ray tracing de manera recursiva con el rayo secundario y disminuyendo en uno el número de rebotes restantes.
+
+4. El color devuelto por la llamada recursiva se considera como el color reflejado \( I_{r} \) en el punto de intersección.
+
+5. El color final del píxel \( P_{c} \) se calcula agregando la contribución del color reflejado al color base del punto de intersección.
+
+   \[ \LARGE P_{c} = ( 1 - r ) \left[ C + s \cdot ( I_{d} + I_{s} ) \right] + r I_{r} \]
+
+   Donde \( r \) es el coeficiente de reflectividad del material.
+
+   Es decir, el color final del píxel es una mezcla entre el color base del punto de intersección y el color reflejado, ponderados por el coeficiente de reflectividad del material.
+
+En [[fig:ray-tracing-reflection-calculation]] se muestra un diagrama que ilustra el proceso de cálculo de la reflexión mediante rayos secundarios.
+
+#+CAPTION: Cálculo de reflexión por medio de rayos secundarios
+#+NAME: fig:ray-tracing-reflection-calculation
+[[./assets/ray-tracing-reflection-math.png]]
+
+* Etapa 7: Posición de la cámara y relación de aspecto (1 punto)
+** Orientación de la cámara
+Hasta el momento hemos desarrollado el /ray tracer/ ignorando la posicion y direccion de la camara. Una vez que tenemos todos los elementos básicos de la óptica, podemos proceder a implementar la parte que se encarga de colocar la cámara en posición. Para ello necesitaremos del uso de matrices de cambio de coordenadas.
+
+Si movemos la posición del espectador al punto \( p \) de tal manera que este dirigiendo la mirada en dirección \( d \) unitario, se podría decir que estamos cambiando nuestro sistema de coordenadas del origen y los ejes \( x \), \( y \), \( z \) al origen centrado en \( p \) y con tres vectores que formen una base ortonormal derecha relacionados con la dirección hacia donde mira el espectador.
+
+Normalizando los vectores \( u \), \( v \) y \( d \) podemos construir una matriz de rotación para armar el cambio de coordenadas. La matriz de rotación que pasa los ejes \( x \), \( y \) y \( z \) al sistema \( u \), \( v \), \( d \)  sería:
+
+\[ \LARGE r = \begin{bmatrix} u_{x} & v_{x} & d_{x} \\ u_{y} & v_{y} & d_{y} \\ u_{z} & v_{z} & d_{z} \end{bmatrix}^{T} = \begin{bmatrix} u_{x} & u_{y} & u_{z} \\ v_{x} & v_{y} & v_{z} \\ d_{x} & d_{y} & d_{z} \end{bmatrix}  \]
+
+#+CAPTION: /Colocando la camara en posición/. El vector \( p \)  representa la posicion del espectador y \( d \) la dirección hacia donde voltea. Los vectores \( u \), \( v \) y \( d \) forman una base ortonormal centrada en el espectador donde el análogo del eje \( Z \) es \( d \).
+#+NAME: fig:ray-tracing-camera-position
+[[./assets/ray-tracing-camera-position.png]]
+
+** Relación de aspecto
+En las etapas anteriores existía la restricción de que la resolución de la imagen sintetizada tenía que ser forzosamente a razón *4:3*. Es el momento de dar libertad al usuario de escoger la resolución y mantener la relación de aspecto correcta.
+
+El problema consiste en armar un rectángulo que mantenga la misma relación de aspecto que la resolución de entrada y además que se mantenga un ángulo de visión correcto. Si tenemos una resolución de ~400×400~ píxeles, podríamos usar el cuadrado unitario \( (x, y, 0) \)  con \( x \in [-0.5, 0.5]\) y \( y \in [-0.5, 0.5] \); sin embargo podríamos usar un cuadrado de área distinta y mantendría la misma relación de aspecto.
+
+Necesitamos un tercer parámetro para definir unívocamente el plano focal de la imagen: el ángulo de visión horizontal. Este ángulo representa la amplitud de visión que tiene el espectador con respecto a su horizontal; por ejemplo, si el espectador tiene un ángulo de visión de 180 grados, puede ver la imagen de lado a lado en su totalidad. Un efecto común derivado del ángulo de visión es la distorsión geométrica causada debido a que el espectador esta “aplanando” un campo de vista esférico en el plano focal. En el campo de la fotografía este efecto se le conoce como /ojo de pescado/ (/fish eye/ en inglés).
+
+#+CAPTION: /Construcción del plano focal/ con la relación de aspecto correcta y el ángulo de visión especificado por el usuario.
+[[./assets/ray-tracing-focal-plane.png]]
+
+Sea \( d \) la distancia focal, \( \alpha \) el ángulo de visión horizontal. Definimos \( W_{fp} \) el ancho del plano focal como:
+
+\[ \LARGE W_{fp} = 2 \cdot d \cdot \tan\left(\frac{\alpha}{2}\right) \]
+
+Si \( d = 5 \) y \( \alpha = \frac{\pi}{3} \),  \( W_{fp} =  10 \cdot \tan(\frac{\pi}{6}) \).
+
+Una vez calculado el ancho del plano focal (\( W_{fp} \)), podemos calcular la altura del mismo (\( H_{fp} \)) utilizando la resolución de entrada que se proporciona en el archivo de escena sabiendo que la relacion de aspecto se debe mantener, es decir:
+
+\[ \LARGE \frac{imageHeight}{imageWidth} = \frac{H_{fp}}{W_{fp}} \]
+
+Así pues despejando \( H_{fp} \):
+
+\[ \LARGE H_{fp} = \frac{W_{fp} \cdot imageHeight}{imageWidth} \]
+
+** Construcción del plano focal
+Conociendo la matriz de transformacion que rota el plano en direccion al espectador, la posicion del espectador y el tama˜no del plano focal, estamos en condiciones de proponer un procedimiento que coloque la camara en posicion.
+
+La forma más sencilla de obtener el resultado que queremos es volver a armar nuestro plano focal coplanar al plano \(XY\) del sistema coordenado, colocar al espectador en \(o = (0, 0, -focalDistance)\) y posteriormente aplicar la matriz de rotación y trasladar el plano a la posición de la cámara. El punto focal de la cámara estará 5 unidades atrás del plano focal, el cual está en la posición dada por el usuario.
+
+El plano focal se construye usando los valores \( W_{fp} \) y \( H_{fp} \) produciendo el rectángulo:
+
+\[ \LARGE P = (x, y, 0) \mid x \in  \left[ -\frac{W_{fp}}{2}, \frac{W_{fp}}{2} \right], y \in  \left[ -\frac{H_{fp}}{2}, \frac{H_{fp}}{2} \right] \]
+
+Para calcular la dirección del rayo que pasa por un pixel \( (pixelX, pixelY) \) del plano focal, primero mapeamos el pixel al plano focal:
+
+\[ \LARGE x_{p} = \left( pixelX + 0.5 \right) \cdot \frac{W_{fp}}{imageWidth} - \frac{W_{fp}}{2} \]
+
+\[ \LARGE y_{p} = \left( pixelY + 0.5 \right) \cdot \frac{H_{fp}}{imageHeight} - \frac{H_{fp}}{2} \]
+
+El punto en el plano focal es \( p = (x_{p}, y_{p}, 0) \). La dirección del rayo en el sistema de coordenadas de la cámara es:
+
+\[ \LARGE d = p - o \]
+
+Finalmente, aplicamos la matriz de rotación para colocar la cámara en posición y trasladamos el origen del rayo a la posición de la cámara \( c \):
+
+\[ \LARGE d_{rotated} = R \cdot d \]
+
+Finalmente, el rayo que parte de la cámara y pasa por el pixel \( (pixelX, pixelY) \) es:
+
+\[ \LARGE \left[c , \frac{d_{rotated}}{|| d_{rotated} ||} \right] \]
+
+* Etapa 8: Multimuestreo (0.5 puntos)
+Existe un efecto producido por la implementación actual del /ray tracer/ que hemos dejado de largo: /aliasing/. El efecto de /aliasing/ es muy estudiado en el área de proceso digital de señales y consiste en un déficit de muestras tomadas por un sistema digital a una variable continua el cual causa artefactos indeseables en la señal representada por el sistema digital. Es un tema de investigación amplio y escapa a los objetivos de este documento, sin embargo, la forma más sencilla de mostrar el aliasing en una imagen sintetizada es por medio de dos imágenes: una con /aliasing/ y una sin él.
+
+#+CAPTION: /Aliasing/. Se ven como bordes dentados en las imágenes.
+#+NAME: fig:ray-tracing-aliasing-example
+[[./assets/ray-tracing-aliasing-example.png]]
+
+Si bien el fenómeno de /aliasing/ es inherente a la discretización producida por un sistema digital, en este caso, cuando se calcula el color de cada píxel por un solo rayo, es posible mejorar la calidad de la imagen utilizando la técnica de /multimuestreo por píxel/ (/oversampling/) que, como su nombre lo indica, consiste en tomar varias muestras para calcular el color resultante del píxel. Las muestras en este caso son los rayos que disparamos en el algoritmo.
+
+La forma más sencilla de implementar el multimuestreo es creando una partición regular de cada píxel, tirar un rayo por cada punto de la partición y aplicar la media aritmética de los colores resultantes de cada rayo. A esta técnica se le conoce como filtro de caja (box filter) y aunque no es la técnica más efectiva, es la más sencilla de implementar. Existen diversas técnicas para mezclar las muestras y producir el píxel resultante, siendo la más usada el filtro gaussiano que realiza un promedio pesado entre las diferentes muestras por medio de una ventana de convolución que se aproxima a la distribución normal de Gauss.
+
+* Etapa 9: Multithreading (0.5 puntos)
+Dada la naturaleza del algoritmo de /ray tracing/, es posible paralelizar el cálculo de los píxeles de la imagen, ya que cada píxel se calcula de manera independiente. Por lo tanto, es posible dividir la imagen en varias secciones y asignar cada sección a un hilo de ejecución diferente para que cada hilo calcule los píxeles de su sección correspondiente.
+
+Básicamente podemos utilizar una estrategia similar al utilizado para calcular la suma de matrices o la convolución de matrices vistos durante el curso.
+* Etapa 10: Ejecución a través de la línea de comandos (0.5 puntos)
+El programa debe ser ejecutable a través de la línea de comandos, recibiendo como argumentos el archivo de escena en formato /JSON/ y el nombre del archivo de salida en formato /PNG/. Un ejemplo de ejecución sería:
+
+#+begin_src bash -n 1
+java -jar ray-tracer-1.0.jar --input path/to/scene.json  --output path/to/output.png --threads 4
+#+end_src
+
+*Valores por omisión*:
++ Si el usuario no especifica el número de hilos, el programa debe utilizar el número de núcleos disponibles en la máquina donde se ejecuta.
++ Si el usuario no especifica el archivo de salida, el programa debe guardar la imagen sintetizada en un archivo llamado ~output-<timestamp>.png~ en el directorio actual de trabajo.
++ Si el usuario no especifica el archivo de entrada, el programa debe mostrar un mensaje de error y terminar la ejecución.
+
+* Etapa 11: Sombras suaves (1 punto extra)
+Las sombras que implementamos en las etapas anteriores se les conoce como /sombras duras/ y la razón de ello es porque generan bordes bien definidos en la superficie de proyección de la sombra. Este modelo se aproxima muy bien a la realidad en caso de que la luz sea unidireccional (como la luz del sol), cuando la fuente luminosa tiene un área muy pequeña y se puede suponer como puntual, o cuando la fuente luminosa se encuentra muy cerca del objeto. Sin embargo, en casos donde la fuente luminosa se origina de una superficie grande, generalmente vemos las sombras desvanecerse paulatinamente sobre la superficie donde se proyectan.
+
+#+CAPTION: /Sombras suaves/. Comparación entre el algoritmo de sombreado
+de las etapas anteriores y el algoritmo de sombreado que se presenta en este
+apartado (derecha).
+#+NAME: fig:ray-tracing-soft-shadow-example
+[[./assets/ray-tracing-soft-shadow-example.png]]
+
+Con la finalidad de implementar esta técnica de sombreado, introducimos un nuevo tipo de fuente luminosa: la /luz de superficie/. Como su nombre lo indica, es una fuente de luz la cual en vez de emitir desde un punto, emite uniformemente desde una superficie. Por simplicidad y para fines ilustrativos, las luces de superficie descritas para este proyecto siempre serán cuadrados.
+
+Las luces de superficie tienen dos parámetros de posición: /dirección/ y /posición/. Al igual que el plano focal, la luz de superficie se puede construir generando cuatro puntos en el plano \( XY \) y posteriormente rotando y trasladando dichos puntos a su posición final. El estudiante puede agregarle atributos así como intensidad luminosa, tamaño de la superficie, etcétera.
+
+Una vez descrita la luz de superficie, el procedimiento para implementar las /sombras suaves/ es por medio de muestreo, una técnica similar a la utilizada para contrarrestar los efectos de /aliasing/ descrita anteriormente. En el caso de la /luz de superficie/, en vez de tirar un solo rayo secundario en dirección a la /luz puntal/, procedemos a crear una partición regular de la superficie luminosa y producimos tantos rayos secundarios como puntos de la partición definamos. Finalmente, el valor de sombreado no será cero o uno como en los casos anteriores, sino un promedio de todos los rayos que muestreamos de la /luz de superficie/, siendo cero aquellos que fueron ocluidos y uno aquellos que lograron alcanzar la fuente luminosa.
+
+#+CAPTION: /Muestreo de sombras/. Usando múltiples rayos secundarios para
+implementar el /sombreado suave/. Las líneas punteadas representan muestras de
+la luz de superficie que han sido ocluidas por un objeto.
+#+NAME: fig:ray-tracing-soft-shadow-math
+[[./assets/ray-tracing-soft-shadow-math.png]]
+* Referencias
+- Tesis de Licenciatura de Maximiliano Monterrubio Gutiérrez [[https://ru.dgb.unam.mx/server/api/core/bitstreams/f27b12d9-2305-4be1-9230-2eac6c6344be/content][Archivo UNAM]].

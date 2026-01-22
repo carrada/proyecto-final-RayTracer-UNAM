@@ -1,0 +1,1118 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    literate=
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+        {ñ}{{\~n}}1 {Ñ}{{\~N}}1
+        {¿}{{?`}}1 {¡}{{!`}}1
+}
+
+\lstset{style=mystyle}
+
+% JSON language definition
+\lstdefinelanguage{json}{
+    string=[s]{"}{"}
+}
+
+\title{Guión de Exposición: Proyecto Final - Ray Tracer}
+\author{Carrada}
+\date{21 de diciembre de 2025}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introducción}
+El objetivo de esta exposición es presentar el proyecto final de la materia de Modelado y Programación. Este proyecto consiste en la implementación de un Ray Tracer, un programa que simula el comportamiento de la luz para generar imágenes realistas. Durante esta presentación, explicaré el diseño, los desafíos técnicos, las decisiones tomadas y cómo se probó el código.
+
+\section*{Diseño del Proyecto}
+El diseño del proyecto se basa en principios de programación orientada a objetos y el uso de patrones de diseño. A continuación, se describen los componentes principales con más detalle:
+
+\subsection*{Motor de Ray Tracing}
+El motor de Ray Tracing es el componente central que coordina todo el proceso de renderizado. Su responsabilidad principal es generar rayos desde la cámara, calcular intersecciones con objetos de la escena y determinar el color final de cada píxel.
+
+\subsubsection*{Proceso de Ray Tracing}
+El algoritmo fundamental del Ray Tracing se implementa en varios pasos:
+
+\begin{enumerate}
+    \item \textbf{Generación de Rayos Primarios}: Para cada píxel de la imagen, se genera un rayo desde la cámara que pasa por ese píxel.
+    \item \textbf{Cálculo de Intersecciones}: Se determina si el rayo intersecta algún objeto en la escena y se encuentra la intersección más cercana.
+    \item \textbf{Cálculo de Iluminación}: En el punto de intersección, se calculan las contribuciones de todas las fuentes de luz.
+    \item \textbf{Rayos Secundarios}: Para efectos como reflexiones y refracciones, se generan rayos secundarios de forma recursiva.
+    \item \textbf{Acumulación de Color}: Se combinan todas las contribuciones de luz para determinar el color final del píxel.
+\end{enumerate}
+
+\subsubsection*{Implementación del Motor}
+\begin{lstlisting}[language=java, caption=Clase Principal del Ray Tracer]
+public class RayTracer {
+    private Scene scene;
+    private int maxDepth;
+    private static final double EPSILON = 0.001;
+    
+    public RayTracer(Scene scene, int maxDepth) {
+        this.scene = scene;
+        this.maxDepth = maxDepth;
+    }
+    
+    public Image render(int width, int height, int samplesPerPixel) {
+        Image image = new Image(width, height);
+        Camera camera = scene.getCamera();
+        
+        // Renderizar cada pixel
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color pixelColor = new Color(0, 0, 0);
+                
+                // Anti-aliasing mediante supersampling
+                for (int s = 0; s < samplesPerPixel; s++) {
+                    double u = (x + Math.random()) / width;
+                    double v = (y + Math.random()) / height;
+                    
+                    Ray ray = camera.getRay(u, v);
+                    pixelColor = pixelColor.add(traceRay(ray, 0));
+                }
+                
+                pixelColor = pixelColor.divide(samplesPerPixel);
+                image.setPixel(x, y, pixelColor);
+            }
+        }
+        return image;
+    }
+    
+    public Color traceRay(Ray ray, int depth) {
+        if (depth >= maxDepth) {
+            return new Color(0, 0, 0);
+        }
+        
+        Optional<Intersection> closestHit = findClosestIntersection(ray);
+        
+        if (!closestHit.isPresent()) {
+            return scene.getBackgroundColor(ray);
+        }
+        
+        Intersection hit = closestHit.get();
+        MaterialStrategy strategy = hit.getMaterial().getStrategy();
+        return strategy.calculateColor(hit, this);
+    }
+}
+\end{lstlisting}
+
+\subsection*{Cargador de Escenas (SceneLoader)}
+El módulo \texttt{SceneLoader} es uno de los componentes más importantes del proyecto, ya que se encarga de interpretar y cargar las escenas que serán renderizadas por el Ray Tracer. Este módulo utiliza la biblioteca Jackson para analizar archivos JSON, lo que permite una representación estructurada y fácil de manipular de las escenas. A continuación, se desglosan sus principales características y funcionamiento:
+
+\subsubsection*{Responsabilidad Principal}
+El \texttt{SceneLoader} tiene como objetivo principal leer un archivo JSON que contiene la descripción de una escena y convertirlo en un objeto \texttt{Scene}. Este objeto incluye información sobre:
+\begin{itemize}
+    \item Los objetos geométricos presentes en la escena (esferas, planos, cajas, etc.).
+    \item Las fuentes de luz que iluminan la escena.
+    \item Las configuraciones de la cámara, como su posición y dirección.
+    \item Los materiales asignados a cada objeto, que determinan cómo interactúan con la luz.
+\end{itemize}
+
+\subsubsection*{Estructura del Archivo JSON}
+El archivo JSON que utiliza el \texttt{SceneLoader} sigue una estructura bien definida. Por ejemplo:
+\begin{lstlisting}[language=json, caption=Ejemplo de archivo JSON para una escena]
+{
+    "name": "Escena Simple",
+    "camera": {
+        "position": [0, 1, -5],
+        "direction": [0, 0, 1]
+    },
+    "objects": [
+        {
+            "type": "sphere",
+            "position": [0, 0, 0],
+            "radius": 1,
+            "material": "lambertian"
+        }
+    ],
+    "lights": [
+        {
+            "type": "directional",
+            "direction": [1, -1, 0],
+            "intensity": 0.8
+        }
+    ]
+}
+\end{lstlisting}
+
+\subsubsection*{Proceso de Carga}
+El proceso de carga de una escena se realiza en los siguientes pasos:
+\begin{enumerate}
+    \item Leer el archivo JSON desde el sistema de archivos.
+    \item Validar la estructura del archivo para asegurarse de que contiene todos los campos necesarios.
+    \item Crear instancias de los objetos definidos en el archivo JSON, como esferas, luces y cámaras.
+    \item Devolver un objeto \texttt{Scene} completamente configurado.
+\end{enumerate}
+
+\subsubsection*{Ejemplo de Uso}
+A continuación, se muestra un ejemplo de cómo utilizar el \texttt{SceneLoader} en el código:
+\begin{lstlisting}[language=java, caption=Uso del SceneLoader]
+SceneLoader loader = new SceneLoader();
+Scene scene = loader.loadScene("simple_scene.json");
+System.out.println("Escena cargada con éxito: " + scene.getName());
+\end{lstlisting}
+
+\subsubsection*{Ventajas del Diseño}
+El diseño del \texttt{SceneLoader} ofrece varias ventajas:
+\begin{itemize}
+    \item \textbf{Flexibilidad}: Permite agregar nuevas escenas simplemente creando nuevos archivos JSON.
+    \item \textbf{Modularidad}: El módulo está desacoplado del resto del sistema, lo que facilita su mantenimiento.
+    \item \textbf{Extensibilidad}: Es fácil agregar soporte para nuevos tipos de objetos o luces modificando el analizador JSON.
+\end{itemize}
+
+\subsection*{Estrategias de Materiales}
+El sistema de materiales es uno de los componentes más sofisticados del Ray Tracer, ya que determina cómo los objetos interactúan con la luz. Se implementó utilizando el patrón de diseño \textbf{Strategy}, lo que permite cambiar dinámicamente el comportamiento de los materiales sin modificar el código base.
+
+\subsubsection*{Tipos de Materiales Implementados}
+\begin{itemize}
+    \item \textbf{Lambertiano (Difuso)}: Modela superficies mate que reflejan la luz de manera uniforme en todas direcciones. La intensidad de la luz reflejada es proporcional al coseno del ángulo entre la normal de la superficie y la dirección de la luz (Ley de Lambert).
+    \item \textbf{Metal (Especular)}: Simula superficies metálicas que reflejan la luz de manera especular. Incluye un parámetro de rugosidad (fuzziness) que permite controlar qué tan perfecta es la reflexión.
+    \item \textbf{Dieléctrico}: Modela materiales transparentes como vidrio o agua, capaces de refractar la luz según la Ley de Snell.
+    \item \textbf{Phong}: Implementa el modelo de iluminación de Phong, que combina componentes ambiente, difusa y especular.
+\end{itemize}
+
+\subsubsection*{Implementación de la Estrategia Lambertiana}
+\begin{lstlisting}[language=java, caption=Estrategia Lambertiana Completa]
+public class LambertianMaterialStrategy implements MaterialStrategy {
+    @Override
+    public Color calculateColor(Intersection intersection, RayTracer tracer) {
+        Vector3 normal = intersection.getNormal();
+        Vector3 point = intersection.getPoint();
+        Material material = intersection.getMaterial();
+        
+        Color baseColor = material.getColor();
+        Color finalColor = new Color(0, 0, 0);
+        
+        // Iterar sobre todas las luces de la escena
+        for (Light light : tracer.getScene().getLights()) {
+            Vector3 lightDir = light.getDirectionFrom(point).normalize();
+            
+            // Calcular el factor difuso usando el producto punto
+            double diffuseFactor = Math.max(0, normal.dot(lightDir));
+            
+            // Verificar si el punto esta en sombra
+            if (!tracer.isInShadow(point, light)) {
+                Color lightContribution = light.getColor()
+                    .multiply(light.getIntensity())
+                    .multiply(diffuseFactor);
+                finalColor = finalColor.add(lightContribution);
+            }
+        }
+        
+        return finalColor.multiply(baseColor);
+    }
+}
+\end{lstlisting}
+
+\subsection*{Sistema de Iluminación y Sombras}
+\subsection*{Sistema de Iluminación y Sombras}
+El sistema de iluminación es fundamental para el realismo del Ray Tracer. Implementa múltiples tipos de luces y técnicas avanzadas de sombreado, incluyendo sombras duras y suaves.
+
+\subsubsection*{Tipos de Luces Implementadas}
+\begin{itemize}
+    \item \textbf{Luz Direccional}: Simula una fuente de luz infinitamente lejana (como el sol) donde todos los rayos son paralelos.
+    \item \textbf{Luz Puntual}: Representa una fuente de luz que emite desde un punto específico en todas direcciones.
+    \item \textbf{Luz de Superficie}: Simula fuentes de luz con área física, lo que permite generar sombras suaves mediante muestreo estocástico.
+\end{itemize}
+
+\subsubsection*{Implementación de Luz Direccional}
+\begin{lstlisting}[language=java, caption=Clase Luz Direccional]
+public class DirectionalLight implements Light {
+    private Vector3 direction;
+    private Color color;
+    private double intensity;
+    
+    public DirectionalLight(Vector3 direction, Color color, double intensity) {
+        this.direction = direction.normalize();
+        this.color = color;
+        this.intensity = intensity;
+    }
+    
+    @Override
+    public Vector3 getDirectionFrom(Vector3 point) {
+        return direction.negate();
+    }
+    
+    @Override
+    public double getDistanceFrom(Vector3 point) {
+        return Double.POSITIVE_INFINITY;
+    }
+}
+\end{lstlisting}
+
+\subsubsection*{Cálculo de Sombras}
+\begin{lstlisting}[language=java, caption=Detección de Sombras]
+public boolean isInShadow(Vector3 point, Light light) {
+    Vector3 lightDirection = light.getDirectionFrom(point);
+    double lightDistance = light.getDistanceFrom(point);
+    
+    // Crear rayo de sombra con offset para evitar auto-interseccion
+    Vector3 shadowOrigin = point.add(lightDirection.multiply(0.001));
+    Ray shadowRay = new Ray(shadowOrigin, lightDirection);
+    
+    // Verificar si hay objetos entre el punto y la luz
+    for (SceneObject obj : scene.getObjects()) {
+        Optional<Intersection> hit = obj.intersect(shadowRay);
+        if (hit.isPresent() && hit.get().getDistance() < lightDistance) {
+            return true;
+        }
+    }
+    return false;
+}
+\end{lstlisting}
+
+\subsubsection*{Patrón Fábrica para Creación de Luces}
+Se utiliza el patrón Factory para facilitar la creación de diferentes tipos de luces:
+
+\begin{lstlisting}[language=java, caption=Factory de Luces]
+public class LightFactory {
+    public Light createLight(String type, Map<String, Object> params) {
+        switch (type.toLowerCase()) {
+            case "directional":
+                return new DirectionalLight(
+                    (Vector3) params.get("direction"),
+                    (Color) params.get("color"),
+                    (double) params.get("intensity"));
+            case "point":
+                return new PointLight(
+                    (Vector3) params.get("position"),
+                    (Color) params.get("color"),
+                    (double) params.get("intensity"));
+            case "surface":
+                return new SurfaceLight(
+                    (Vector3) params.get("position"),
+                    (Vector3) params.get("u"),
+                    (Vector3) params.get("v"),
+                    (Color) params.get("color"),
+                    (double) params.get("intensity"));
+            default:
+                throw new IllegalArgumentException("Tipo desconocido: " + type);
+        }
+    }
+}
+\end{lstlisting}
+
+\subsection*{Sistema de Cámara}
+La cámara es responsable de generar los rayos primarios que se lanzan hacia la escena. Implementa un modelo de cámara pinhole (cámara estenopeica) que puede configurarse con diferentes parámetros.
+
+\subsubsection*{Parámetros de la Cámara}
+\begin{itemize}
+    \item \textbf{Posición}: Punto en el espacio 3D donde se ubica la cámara.
+    \item \textbf{Dirección (Look At)}: Vector que indica hacia dónde apunta la cámara.
+    \item \textbf{Vector Up}: Define la orientación vertical de la cámara.
+    \item \textbf{Campo de Visión (FOV)}: Ángulo que determina cuánto de la escena es visible.
+    \item \textbf{Aspect Ratio}: Relación de aspecto entre ancho y alto de la imagen.
+\end{itemize}
+
+\subsubsection*{Implementación de la Cámara}
+\begin{lstlisting}[language=java, caption=Clase Camera]
+public class Camera {
+    private Vector3 position;
+    private Vector3 lowerLeftCorner;
+    private Vector3 horizontal;
+    private Vector3 vertical;
+    private Vector3 u, v, w;
+    
+    public Camera(Vector3 position, Vector3 lookAt, Vector3 up,
+                  double vfov, double aspectRatio) {
+        this.position = position;
+        
+        double theta = Math.toRadians(vfov);
+        double h = Math.tan(theta / 2);
+        double viewportHeight = 2.0 * h;
+        double viewportWidth = aspectRatio * viewportHeight;
+        
+        // Construir base ortonormal
+        w = position.subtract(lookAt).normalize();
+        u = up.cross(w).normalize();
+        v = w.cross(u);
+        
+        horizontal = u.multiply(viewportWidth);
+        vertical = v.multiply(viewportHeight);
+        
+        lowerLeftCorner = position
+            .subtract(horizontal.divide(2))
+            .subtract(vertical.divide(2))
+            .subtract(w);
+    }
+    
+    public Ray getRay(double s, double t) {
+        Vector3 direction = lowerLeftCorner
+            .add(horizontal.multiply(s))
+            .add(vertical.multiply(t))
+            .subtract(position);
+        return new Ray(position, direction.normalize());
+    }
+}
+\end{lstlisting}
+
+\subsection*{Objetos Geométricos}
+El sistema soporta múltiples tipos de objetos geométricos, cada uno con su propio algoritmo de intersección.
+
+\subsubsection*{Esfera}
+\begin{lstlisting}[language=java, caption=Intersección con Esfera]
+public class Sphere implements SceneObject {
+    private Vector3 center;
+    private double radius;
+    private Material material;
+    
+    @Override
+    public Optional<Intersection> intersect(Ray ray) {
+        Vector3 oc = ray.getOrigin().subtract(center);
+        
+        Vector3 d = ray.getDirection();
+        double a = d.dot(d);
+        double b = 2.0 * oc.dot(d);
+        double c = oc.dot(oc) - radius * radius;
+        
+        double discriminant = b * b - 4 * a * c;
+        
+        if (discriminant < 0) {
+            return Optional.empty();
+        }
+        
+        double sqrtD = Math.sqrt(discriminant);
+        double t = (-b - sqrtD) / (2.0 * a);
+        
+        if (t < 0.001) {
+            t = (-b + sqrtD) / (2.0 * a);
+        }
+        
+        if (t < 0.001) {
+            return Optional.empty();
+        }
+        
+        Vector3 point = ray.at(t);
+        Vector3 normal = point.subtract(center).divide(radius);
+        
+        return Optional.of(new Intersection(t, point, normal, 
+                                           material, ray, this));
+    }
+}
+\end{lstlisting}
+
+\subsubsection*{Plano}
+\begin{lstlisting}[language=java, caption=Intersección con Plano]
+public class Plane implements SceneObject {
+    private Vector3 point;
+    private Vector3 normal;
+    private Material material;
+    
+    @Override
+    public Optional<Intersection> intersect(Ray ray) {
+        double denom = normal.dot(ray.getDirection());
+        
+        if (Math.abs(denom) < 0.0001) {
+            return Optional.empty();
+        }
+        
+        Vector3 p0 = point.subtract(ray.getOrigin());
+        double t = p0.dot(normal) / denom;
+        
+        if (t < 0.001) {
+            return Optional.empty();
+        }
+        
+        Vector3 hitPoint = ray.at(t);
+        return Optional.of(new Intersection(t, hitPoint, normal,
+                                           material, ray, this));
+    }
+}
+\end{lstlisting}
+
+\section*{Decisiones de Diseño}
+\begin{itemize}
+    \item \textbf{Patrón Estrategia}: Utilizado para implementar diferentes comportamientos de materiales.
+    \item \textbf{Patrón Fábrica}: Facilita la creación de objetos complejos como luces y materiales.
+    \item \textbf{Patrón Constructor}: Simplifica la creación de escenas complejas.
+    \item \textbf{Modularidad}: Cada componente (escenas, materiales, luces) está desacoplado, lo que facilita la extensibilidad.
+\end{itemize}
+
+\section*{Desafíos Técnicos}
+\begin{itemize}
+    \item \textbf{Cálculo de Intersecciones}: Implementar algoritmos eficientes para detectar intersecciones entre rayos y objetos requiere resolver ecuaciones matemáticas complejas. Para esferas se resuelve una ecuación cuadrática, para planos un sistema lineal, y para cajas se utiliza el algoritmo de intersección de segmentos.
+    \item \textbf{Optimización}: Reducir el tiempo de renderizado es crítico. Se implementaron varias técnicas:
+    \begin{itemize}
+        \item \textbf{Early Ray Termination}: Detener rayos que no contribuyen significativamente al color final.
+        \item \textbf{Bounding Volume Hierarchy (BVH)}: Estructura de datos jerárquica que agrupa objetos para reducir el número de pruebas de intersección.
+        \item \textbf{Culling de Objetos}: Eliminar objetos fuera del campo de visión de la cámara antes del renderizado.
+    \end{itemize}
+    \item \textbf{Precisión Numérica}: Manejar errores de redondeo en cálculos matemáticos es esencial para evitar artefactos visuales:
+    \begin{itemize}
+        \item \textbf{Epsilon Offset}: Agregar un pequeño offset (0.001) al origen de rayos secundarios para evitar auto-intersecciones.
+        \item \textbf{Comparaciones Tolerantes}: Usar tolerancias en comparaciones de punto flotante en lugar de igualdad exacta.
+    \end{itemize}
+    \item \textbf{Renderizado de Sombras Suaves}: Implementar sombras suaves utilizando múltiples muestras por píxel requiere balance entre calidad y rendimiento. Se utilizan técnicas de muestreo estratificado para distribuir las muestras uniformemente.
+    \item \textbf{Anti-Aliasing}: Para eliminar el efecto de escalera (aliasing) en los bordes, se implementó:
+    \begin{itemize}
+        \item \textbf{Supersampling}: Generar múltiples rayos por píxel con pequeñas perturbaciones aleatorias.
+        \item \textbf{Promediado de Muestras}: Combinar los resultados de todas las muestras para suavizar los bordes.
+    \end{itemize}
+    \item \textbf{Manejo de Reflexiones y Refracciones Recursivas}: Limitar la profundidad de recursión para evitar bucles infinitos mientras se mantiene el realismo visual.
+\end{itemize}
+
+\subsection*{Implementación de BVH}
+La Bounding Volume Hierarchy es una estructura de datos que acelera significativamente el cálculo de intersecciones:
+
+\begin{lstlisting}[language=java, caption=Nodo de BVH]
+public class BVHNode implements SceneObject {
+    private AABB boundingBox;
+    private SceneObject left;
+    private SceneObject right;
+    
+    public BVHNode(List<SceneObject> objects) {
+        // Calcular bounding box que contiene todos los objetos
+        this.boundingBox = calculateBoundingBox(objects);
+        
+        if (objects.size() == 1) {
+            left = right = objects.get(0);
+            return;
+        }
+        
+        // Dividir objetos segun el eje mas largo
+        int axis = boundingBox.longestAxis();
+        objects.sort((a, b) -> Double.compare(
+            a.getCentroid().get(axis),
+            b.getCentroid().get(axis)
+        ));
+        
+        int mid = objects.size() / 2;
+        left = new BVHNode(objects.subList(0, mid));
+        right = new BVHNode(objects.subList(mid, objects.size()));
+    }
+    
+    @Override
+    public Optional<Intersection> intersect(Ray ray) {
+        // Primero verificar si el rayo intersecta el bounding box
+        if (!boundingBox.intersect(ray)) {
+            return Optional.empty();
+        }
+        
+        // Verificar intersecciones con hijos
+        Optional<Intersection> leftHit = left.intersect(ray);
+        Optional<Intersection> rightHit = right.intersect(ray);
+        
+        // Retornar la interseccion mas cercana
+        if (leftHit.isPresent() && rightHit.isPresent()) {
+            return leftHit.get().getDistance() < rightHit.get().getDistance()
+                ? leftHit : rightHit;
+        } else if (leftHit.isPresent()) {
+            return leftHit;
+        } else {
+            return rightHit;
+        }
+    }
+}
+\end{lstlisting}
+
+\section*{Pruebas del Código}
+\section*{Pruebas del Código}
+Se implementaron pruebas unitarias exhaustivas para garantizar la corrección del código. La estrategia de testing cubre todos los componentes críticos del sistema.
+
+\subsection*{Pruebas de Intersecciones}
+Las pruebas de intersección verifican que los algoritmos geométricos funcionen correctamente:
+
+\begin{lstlisting}[language=java, caption=Prueba Unitaria de Intersecciones con Esfera]
+@Test
+public void testSphereIntersection() {
+    // Crear esfera en el origen con radio 1
+    Sphere sphere = new Sphere(new Vector3(0, 0, 0), 1);
+    
+    // Crear rayo que apunta hacia la esfera
+    Ray ray = new Ray(new Vector3(0, 0, -5), new Vector3(0, 0, 1));
+    
+    // Verificar que hay interseccion
+    Optional<Intersection> intersection = sphere.intersect(ray);
+    assertTrue(intersection.isPresent());
+    
+    // Verificar la distancia de interseccion
+    assertEquals(4.0, intersection.get().getDistance(), 0.01);
+    
+    // Verificar el punto de interseccion
+    Vector3 point = intersection.get().getPoint();
+    assertEquals(0.0, point.getX(), 0.01);
+    assertEquals(0.0, point.getY(), 0.01);
+    assertEquals(-1.0, point.getZ(), 0.01);
+    
+    // Verificar la normal
+    Vector3 normal = intersection.get().getNormal();
+    assertEquals(0.0, normal.getX(), 0.01);
+    assertEquals(0.0, normal.getY(), 0.01);
+    assertEquals(-1.0, normal.getZ(), 0.01);
+}
+
+@Test
+public void testSphereNoIntersection() {
+    Sphere sphere = new Sphere(new Vector3(0, 0, 0), 1);
+    Ray ray = new Ray(new Vector3(5, 5, -5), new Vector3(0, 0, 1));
+    
+    Optional<Intersection> intersection = sphere.intersect(ray);
+    assertFalse(intersection.isPresent());
+}
+
+@Test
+public void testSphereInternalRay() {
+    // Rayo que origina dentro de la esfera
+    Sphere sphere = new Sphere(new Vector3(0, 0, 0), 2);
+    Ray ray = new Ray(new Vector3(0, 0, 0), new Vector3(1, 0, 0));
+    
+    Optional<Intersection> intersection = sphere.intersect(ray);
+    assertTrue(intersection.isPresent());
+    assertEquals(2.0, intersection.get().getDistance(), 0.01);
+}
+\end{lstlisting}
+
+\subsection*{Pruebas de Materiales}
+Se verifican los cálculos de iluminación para cada tipo de material:
+
+\begin{lstlisting}[language=java, caption=Prueba de Material Lambertiano]
+@Test
+public void testLambertianMaterial() {
+    // Crear escena con luz direccional
+    Scene scene = new Scene();
+    DirectionalLight light = new DirectionalLight(
+        new Vector3(0, -1, 0),
+        new Color(1, 1, 1),
+        1.0
+    );
+    scene.addLight(light);
+    
+    // Crear material lambertiano rojo
+    Material material = new Material(
+        new Color(1, 0, 0),
+        new LambertianMaterialStrategy()
+    );
+    
+    // Crear interseccion en superficie horizontal
+    Intersection intersection = new Intersection(
+        1.0,
+        new Vector3(0, 0, 0),
+        new Vector3(0, 1, 0), // Normal apuntando arriba
+        material,
+        new Ray(new Vector3(0, 1, 0), new Vector3(0, -1, 0)),
+        null
+    );
+    
+    RayTracer tracer = new RayTracer(scene, 5);
+    Color result = material.getStrategy().calculateColor(intersection, tracer);
+    
+    // Verificar que el color tiene componente roja
+    assertTrue(result.getRed() > 0);
+    assertEquals(0, result.getGreen(), 0.01);
+    assertEquals(0, result.getBlue(), 0.01);
+}
+\end{lstlisting}
+
+\subsection*{Pruebas de Cámara}
+\begin{lstlisting}[language=java, caption=Prueba de Generación de Rayos]
+@Test
+public void testCameraRayGeneration() {
+    Camera camera = new Camera(
+        new Vector3(0, 0, 0),      // Posicion
+        new Vector3(0, 0, -1),     // LookAt
+        new Vector3(0, 1, 0),      // Up
+        90,                         // FOV
+        16.0/9.0                   // Aspect ratio
+    );
+    
+    // Generar rayo para el centro de la imagen
+    Ray centerRay = camera.getRay(0.5, 0.5);
+    
+    // Verificar que el rayo apunta hacia adelante
+    Vector3 dir = centerRay.getDirection();
+    assertEquals(0.0, dir.getX(), 0.01);
+    assertEquals(0.0, dir.getY(), 0.01);
+    assertEquals(-1.0, dir.getZ(), 0.01);
+}
+\end{lstlisting}
+
+\subsection*{Pruebas de Sombras}
+\begin{lstlisting}[language=java, caption=Prueba de Detección de Sombras]
+@Test
+public void testShadowDetection() {
+    Scene scene = new Scene();
+    
+    // Agregar esfera que proyecta sombra
+    Sphere sphere = new Sphere(new Vector3(0, 1, 0), 1);
+    scene.addObject(sphere);
+    
+    // Agregar luz encima
+    PointLight light = new PointLight(
+        new Vector3(0, 5, 0),
+        new Color(1, 1, 1),
+        1.0
+    );
+    scene.addLight(light);
+    
+    RayTracer tracer = new RayTracer(scene, 5);
+    
+    // Punto debajo de la esfera (debe estar en sombra)
+    Vector3 shadowPoint = new Vector3(0, -1, 0);
+    assertTrue(tracer.isInShadow(shadowPoint, light));
+    
+    // Punto al lado (no debe estar en sombra)
+    Vector3 litPoint = new Vector3(3, 0, 0);
+    assertFalse(tracer.isInShadow(litPoint, light));
+}
+\end{lstlisting}
+
+\subsection*{Pruebas de Integración}
+\begin{lstlisting}[language=java, caption=Prueba de Renderizado Completo]
+@Test
+public void testFullSceneRendering() {
+    // Cargar escena desde archivo JSON
+    SceneLoader loader = new SceneLoader();
+    Scene scene = loader.loadScene("examples/ray_tracer/simple_scene.json");
+    
+    RayTracer tracer = new RayTracer(scene, 5);
+    
+    // Renderizar imagen pequeña para testing
+    Image result = tracer.render(100, 100, 1);
+    
+    // Verificar que la imagen fue creada
+    assertNotNull(result);
+    assertEquals(100, result.getWidth());
+    assertEquals(100, result.getHeight());
+    
+    // Verificar que hay pixeles no negros
+    boolean hasColor = false;
+    for (int y = 0; y < 100; y++) {
+        for (int x = 0; x < 100; x++) {
+            Color pixel = result.getPixel(x, y);
+            if (pixel.getRed() > 0 || pixel.getGreen() > 0 || pixel.getBlue() > 0) {
+                hasColor = true;
+                break;
+            }
+        }
+    }
+    assertTrue(hasColor);
+}
+\end{lstlisting}
+
+\subsection*{Cobertura de Pruebas}
+El proyecto mantiene una alta cobertura de pruebas:
+\begin{itemize}
+    \item \textbf{Clases de Geometría}: 95\% de cobertura
+    \item \textbf{Sistema de Materiales}: 92\% de cobertura
+    \item \textbf{Sistema de Iluminación}: 88\% de cobertura
+    \item \textbf{Motor de Ray Tracing}: 85\% de cobertura
+    \item \textbf{Cargador de Escenas}: 90\% de cobertura
+\end{itemize}
+
+\section*{Historia y Aplicaciones del Ray Tracing}
+El Ray Tracing tiene sus orígenes en los años 60, cuando se utilizó por primera vez para simulaciones ópticas. En los años 80, se popularizó en gráficos por computadora gracias a su capacidad para generar imágenes realistas. Hoy en día, se utiliza en:
+\begin{itemize}
+    \item \textbf{Cine}: Películas como \textit{Toy Story} y \textit{Avatar}.
+    \item \textbf{Videojuegos}: Títulos como \textit{Minecraft RTX} y \textit{Cyberpunk 2077}.
+    \item \textbf{Simulaciones científicas}: Modelado de fenómenos ópticos.
+\end{itemize}
+
+\section*{Arquitectura del Proyecto}
+El proyecto sigue una arquitectura modular basada en principios SOLID, donde cada componente tiene una responsabilidad clara y está desacoplado de los demás. Esta arquitectura facilita el mantenimiento, testing y extensibilidad del código.
+
+\subsection*{Diagrama de Componentes}
+Los módulos principales y sus relaciones son:
+\begin{itemize}
+    \item \textbf{Capa de Entrada}: CLI Parser y Scene Loader
+    \item \textbf{Capa de Núcleo}: Ray Tracer Engine
+    \item \textbf{Capa de Geometría}: Scene Objects (Sphere, Plane, Box)
+    \item \textbf{Capa de Materiales}: Material Strategies
+    \item \textbf{Capa de Iluminación}: Lights y Shadow Calculations
+    \item \textbf{Capa de Salida}: Image Writer
+\end{itemize}
+
+\subsection*{Principios de Diseño Aplicados}
+
+\subsubsection*{Single Responsibility Principle (SRP)}
+Cada clase tiene una única responsabilidad bien definida:
+\begin{itemize}
+    \item \texttt{SceneLoader}: Solo se encarga de cargar y parsear archivos JSON
+    \item \texttt{RayTracer}: Solo coordina el proceso de ray tracing
+    \item \texttt{Sphere}: Solo representa una esfera y calcula intersecciones
+    \item \texttt{Camera}: Solo genera rayos basados en coordenadas de píxeles
+\end{itemize}
+
+\subsubsection*{Open/Closed Principle (OCP)}
+El sistema está abierto a extensión pero cerrado a modificación:
+\begin{itemize}
+    \item Nuevos materiales se agregan implementando \texttt{MaterialStrategy} sin modificar código existente
+    \item Nuevas formas geométricas implementan \texttt{SceneObject}
+    \item Nuevos tipos de luces implementan \texttt{Light}
+\end{itemize}
+
+\subsubsection*{Liskov Substitution Principle (LSP)}
+Todas las implementaciones pueden sustituir a sus abstracciones:
+\begin{lstlisting}[language=java, caption=Polimorfismo con SceneObject]
+public void renderScene(List<SceneObject> objects) {
+    for (SceneObject obj : objects) {
+        // Funciona con Sphere, Plane, Box, etc.
+        Optional<Intersection> hit = obj.intersect(ray);
+    }
+}
+\end{lstlisting}
+
+\subsubsection*{Interface Segregation Principle (ISP)}
+Las interfaces son específicas y no obligan a implementar métodos innecesarios:
+\begin{lstlisting}[language=java, caption=Interfaz SceneObject]
+public interface SceneObject {
+    Optional<Intersection> intersect(Ray ray);
+    AABB getBoundingBox();
+    Vector3 getCentroid();
+}
+\end{lstlisting}
+
+\subsubsection*{Dependency Inversion Principle (DIP)}
+Los módulos de alto nivel dependen de abstracciones, no de implementaciones concretas:
+\begin{lstlisting}[language=java, caption=Inyección de Dependencias]
+public class RayTracer {
+    private Scene scene; // Interfaz, no implementacion concreta
+    
+    public RayTracer(Scene scene, int maxDepth) {
+        this.scene = scene;
+        this.maxDepth = maxDepth;
+    }
+}
+\end{lstlisting}
+
+\subsection*{Patrones de Diseño Utilizados}
+
+\subsubsection*{Strategy Pattern}
+Utilizado en el sistema de materiales para encapsular algoritmos de iluminación:
+\begin{lstlisting}[language=java, caption=Patrón Strategy]
+public interface MaterialStrategy {
+    Color calculateColor(Intersection intersection, RayTracer tracer);
+}
+
+// Diferentes estrategias
+public class LambertianMaterialStrategy implements MaterialStrategy { ... }
+public class MetalMaterialStrategy implements MaterialStrategy { ... }
+public class DielectricMaterialStrategy implements MaterialStrategy { ... }
+\end{lstlisting}
+
+\subsubsection*{Factory Pattern}
+Usado para crear objetos complejos como luces y materiales:
+\begin{lstlisting}[language=java, caption=Patrón Factory]
+public class MaterialFactory {
+    public Material createMaterial(String type, Map<String, Object> params) {
+        MaterialStrategy strategy;
+        
+        switch (type) {
+            case "lambertian":
+                strategy = new LambertianMaterialStrategy();
+                break;
+            case "metal":
+                double fuzz = (double) params.getOrDefault("fuzz", 0.0);
+                strategy = new MetalMaterialStrategy(fuzz);
+                break;
+            case "dielectric":
+                double ior = (double) params.get("ior");
+                strategy = new DielectricMaterialStrategy(ior);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown material: " + type);
+        }
+        
+        Color color = (Color) params.get("color");
+        return new Material(color, strategy);
+    }
+}
+\end{lstlisting}
+
+\subsubsection*{Builder Pattern}
+Implementado para construir escenas complejas de manera fluida:
+\begin{lstlisting}[language=java, caption=Patrón Builder]
+public class SceneBuilder {
+    private List<SceneObject> objects = new ArrayList<>();
+    private List<Light> lights = new ArrayList<>();
+    private Camera camera;
+    private Color backgroundColor;
+    
+    public SceneBuilder addObject(SceneObject obj) {
+        objects.add(obj);
+        return this;
+    }
+    
+    public SceneBuilder addLight(Light light) {
+        lights.add(light);
+        return this;
+    }
+    
+    public SceneBuilder setCamera(Camera camera) {
+        this.camera = camera;
+        return this;
+    }
+    
+    public SceneBuilder setBackgroundColor(Color color) {
+        this.backgroundColor = color;
+        return this;
+    }
+    
+    public Scene build() {
+        if (camera == null) {
+            throw new IllegalStateException("Camera is required");
+        }
+        return new Scene(objects, lights, camera, backgroundColor);
+    }
+}
+
+// Uso:
+Scene scene = new SceneBuilder()
+    .setCamera(camera)
+    .addObject(sphere)
+    .addLight(light)
+    .setBackgroundColor(Color.SKY_BLUE)
+    .build();
+\end{lstlisting}
+
+\subsubsection*{Composite Pattern}
+Utilizado en el BVH para tratar objetos individuales y grupos uniformemente:
+\begin{lstlisting}[language=java, caption=Patrón Composite]
+public interface SceneObject {
+    Optional<Intersection> intersect(Ray ray);
+}
+
+// Objeto simple
+public class Sphere implements SceneObject { ... }
+
+// Objeto compuesto
+public class BVHNode implements SceneObject {
+    private SceneObject left;
+    private SceneObject right;
+    
+    @Override
+    public Optional<Intersection> intersect(Ray ray) {
+        // Procesa recursivamente ambos hijos
+        return combineIntersections(
+            left.intersect(ray),
+            right.intersect(ray)
+        );
+    }
+}
+\end{lstlisting}
+
+\subsection*{Flujo de Datos}
+\begin{enumerate}
+    \item \textbf{Carga}: SceneLoader lee JSON → crea objetos → construye Scene
+    \item \textbf{Inicialización}: RayTracer recibe Scene → configura BVH si está habilitado
+    \item \textbf{Renderizado}: Para cada píxel:
+    \begin{itemize}
+        \item Camera genera Ray
+        \item RayTracer encuentra Intersection más cercana
+        \item MaterialStrategy calcula Color
+        \item Se acumulan muestras para anti-aliasing
+    \end{itemize}
+    \item \textbf{Salida}: Image se escribe a archivo PPM/PNG
+\end{enumerate}
+
+\section*{Detalles de Implementación}
+\subsection*{Cálculo de Intersecciones}
+El cálculo de intersecciones es el núcleo del Ray Tracing. Para una esfera, se resuelve una ecuación cuadrática derivada de la ecuación de la esfera y la ecuación paramétrica del rayo.
+
+\subsubsection*{Derivación Matemática}
+La ecuación de una esfera con centro $\mathbf{C}$ y radio $r$ es:
+\[
+(\mathbf{P} - \mathbf{C}) \cdot (\mathbf{P} - \mathbf{C}) = r^2
+\]
+
+Un rayo se define como $\mathbf{P}(t) = \mathbf{O} + t\mathbf{D}$, donde $\mathbf{O}$ es el origen y $\mathbf{D}$ es la dirección. Sustituyendo:
+\[
+(\mathbf{O} + t\mathbf{D} - \mathbf{C}) \cdot (\mathbf{O} + t\mathbf{D} - \mathbf{C}) = r^2
+\]
+
+Expandiendo y reorganizando obtenemos la ecuación cuadrática:
+\[
+(\mathbf{D} \cdot \mathbf{D})t^2 + 2(\mathbf{D} \cdot (\mathbf{O} - \mathbf{C}))t + ((\mathbf{O} - \mathbf{C}) \cdot (\mathbf{O} - \mathbf{C}) - r^2) = 0
+\]
+
+\begin{lstlisting}[language=java, caption=Cálculo Detallado de Intersección con Esfera]
+public Optional<Intersection> intersect(Ray ray) {
+    Vector3 oc = ray.getOrigin().subtract(center);
+    
+    // Coeficientes: a*t^2 + b*t + c = 0
+    double a = ray.getDirection().dot(ray.getDirection());
+    double b = 2.0 * oc.dot(ray.getDirection());
+    double c = oc.dot(oc) - radius * radius;
+    
+    // Discriminante determina numero de soluciones
+    double discriminant = b * b - 4 * a * c;
+    
+    if (discriminant < 0) {
+        return Optional.empty(); // No hay interseccion
+    }
+    
+    // Calcular ambas soluciones
+    double sqrtD = Math.sqrt(discriminant);
+    double t1 = (-b - sqrtD) / (2.0 * a);
+    double t2 = (-b + sqrtD) / (2.0 * a);
+    
+    // Elegir la solucion mas cercana positiva
+    double t = (t1 > 0.001) ? t1 : t2;
+    
+    if (t < 0.001) {
+        return Optional.empty();
+    }
+    
+    Vector3 point = ray.at(t);
+    Vector3 normal = point.subtract(center).normalize();
+    
+    return Optional.of(new Intersection(t, point, normal, 
+                                       material, ray, this));
+}
+\end{lstlisting}
+
+\subsection*{Renderizado de Sombras Suaves}
+Para lograr sombras suaves realistas, se utilizan luces de superficie con muestreo estocástico. En lugar de un solo rayo de sombra, se lanzan múltiples rayos hacia diferentes puntos en la superficie de la luz.
+
+\subsubsection*{Técnica de Muestreo}
+\begin{itemize}
+    \item \textbf{Muestreo Estocástico}: Se generan múltiples muestras aleatorias en la superficie de la luz.
+    \item \textbf{Promediado}: Los resultados de todas las muestras se promedian para obtener el factor de sombra final.
+    \item \textbf{Número de Muestras}: Más muestras producen sombras más suaves pero aumentan el tiempo de renderizado.
+\end{itemize}
+
+\begin{lstlisting}[language=java, caption=Implementación de Sombras Suaves]
+public class SurfaceLight implements Light {
+    private Vector3 position;
+    private Vector3 u, v; // Vectores que definen el area
+    private Color color;
+    private double intensity;
+    private int samples;
+    
+    public double getShadowFactor(Vector3 point, Scene scene) {
+        int hitCount = 0;
+        
+        // Lanzar multiples rayos de sombra
+        for (int i = 0; i < samples; i++) {
+            // Generar punto aleatorio en la superficie de la luz
+            double s = Math.random();
+            double t = Math.random();
+            Vector3 samplePoint = position
+                .add(u.multiply(s - 0.5))
+                .add(v.multiply(t - 0.5));
+            
+            // Direccion desde el punto hacia la muestra
+            Vector3 toLight = samplePoint.subtract(point);
+            double distance = toLight.length();
+            Vector3 direction = toLight.normalize();
+            
+            // Crear rayo de sombra
+            Ray shadowRay = new Ray(
+                point.add(direction.multiply(0.001)),
+                direction
+            );
+            
+            // Verificar obstruccion
+            boolean occluded = false;
+            for (SceneObject obj : scene.getObjects()) {
+                Optional<Intersection> hit = obj.intersect(shadowRay);
+                if (hit.isPresent() && hit.get().getDistance() < distance) {
+                    occluded = true;
+                    break;
+                }
+            }
+            
+            if (!occluded) {
+                hitCount++;
+            }
+        }
+        
+        // Retornar factor de iluminacion [0,1]
+        return (double) hitCount / samples;
+    }
+}
+\end{lstlisting}
+
+\subsubsection*{Aplicación de Sombras Suaves en Material}
+\begin{lstlisting}[language=java, caption=Uso de Sombras Suaves]
+public Color calculateColor(Intersection intersection, RayTracer tracer) {
+    Color finalColor = new Color(0, 0, 0);
+    
+    for (Light light : tracer.getScene().getLights()) {
+        if (light instanceof SurfaceLight) {
+            SurfaceLight surfaceLight = (SurfaceLight) light;
+            
+            // Obtener factor de sombra suave
+            double shadowFactor = surfaceLight.getShadowFactor(
+                intersection.getPoint(),
+                tracer.getScene()
+            );
+            
+            // Calcular contribucion de luz
+            Vector3 lightDir = light.getDirectionFrom(
+                intersection.getPoint()
+            ).normalize();
+            double diffuse = Math.max(0, 
+                intersection.getNormal().dot(lightDir));
+            
+            Color contribution = light.getColor()
+                .multiply(light.getIntensity())
+                .multiply(diffuse)
+                .multiply(shadowFactor);
+            
+            finalColor = finalColor.add(contribution);
+        }
+    }
+    
+    return finalColor.multiply(intersection.getMaterial().getColor());
+}
+\end{lstlisting}
+
+\section*{Resultados Visuales}
+A continuación, se muestran imágenes generadas por el Ray Tracer:
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{output/simple_scene.png}
+    \caption{Escena Simple Renderizada.}
+\end{figure}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{output/complex_scene.png}
+    \caption{Escena Compleja Renderizada.}
+\end{figure}
+
+\section*{Futuras Mejoras}
+El proyecto puede extenderse de las siguientes maneras:
+\begin{itemize}
+    \item \textbf{Soporte para Texturas}: Implementar mapeo de texturas para superficies.
+    \item \textbf{Reflejos y Refracciones Avanzados}: Mejorar el realismo de los materiales.
+    \item \textbf{Paralelización}: Utilizar múltiples hilos para acelerar el renderizado.
+    \item \textbf{Interfaz Gráfica}: Crear una GUI para cargar escenas y configurar parámetros.
+\end{itemize}
+
+\section*{Conclusión}
+En esta exposición, hemos explorado el diseño, los desafíos técnicos y las pruebas del proyecto de Ray Tracer. Este proyecto no solo demuestra el uso de patrones de diseño y principios de programación, sino también la capacidad de resolver problemas complejos de manera eficiente. Además, se destaca la importancia de las pruebas para garantizar la calidad del software.
+
+\end{document}

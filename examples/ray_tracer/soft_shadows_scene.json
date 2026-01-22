@@ -1,0 +1,118 @@
+{
+  "imageWidth": 800,
+  "imageHeight": 600,
+  "focalDistance": 5.0,
+  "samplesPerPixel": 1,
+  "camera": {
+    "position": [0.0, 3.0, -10.0],
+    "direction": [0.0, -0.15, 1.0],
+    "normalUp": [0.0, 1.0, 0.0],
+    "angleOfVision": 60.0
+  },
+  "rayMaxBounces": 3,
+  "backgroundColor": [0.05, 0.05, 0.08],
+  "ambientLight": [0.02, 0.02, 0.02],
+  "materials": [
+    {
+      "id": "red_diffuse",
+      "color": [0.9, 0.1, 0.1],
+      "diffuseCoefficient": 0.95,
+      "specularCoefficient": 0.1,
+      "specularHardness": 20,
+      "reflectivity": 0.0
+    },
+    {
+      "id": "blue_glossy",
+      "color": [0.1, 0.3, 0.9],
+      "diffuseCoefficient": 0.7,
+      "specularCoefficient": 0.7,
+      "specularHardness": 120,
+      "reflectivity": 0.3
+    },
+    {
+      "id": "green_matte",
+      "color": [0.2, 0.8, 0.2],
+      "diffuseCoefficient": 0.9,
+      "specularCoefficient": 0.05,
+      "specularHardness": 10,
+      "reflectivity": 0.0
+    },
+    {
+      "id": "white_floor",
+      "color": [0.85, 0.85, 0.85],
+      "diffuseCoefficient": 0.95,
+      "specularCoefficient": 0.02,
+      "specularHardness": 15,
+      "reflectivity": 0.05
+    },
+    {
+      "id": "back_wall",
+      "color": [0.7, 0.7, 0.75],
+      "diffuseCoefficient": 0.9,
+      "specularCoefficient": 0.0,
+      "specularHardness": 1,
+      "reflectivity": 0.0
+    }
+  ],
+  "lights": [
+    {
+      "type": "surface",
+      "color": [1.0, 0.95, 0.9],
+      "intensity": 1.2,
+      "position": [0.0, 8.0, 0.0],
+      "normal": [0.0, -1.0, 0.0],
+      "width": 4.0,
+      "height": 4.0,
+      "samples": 25
+    },
+    {
+      "type": "directional",
+      "color": [0.8, 0.85, 1.0],
+      "intensity": 0.3,
+      "direction": [0.5, -1.0, 0.3]
+    },
+    {
+      "type": "point",
+      "color": [1.0, 0.8, 0.6],
+      "intensity": 0.5,
+      "position": [-5.0, 4.0, -3.0]
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "RedSphere",
+      "materialId": "red_diffuse",
+      "position": [-2.0, 1.0, 3.0],
+      "radius": 1.0
+    },
+    {
+      "type": "sphere",
+      "name": "BlueSphere",
+      "materialId": "blue_glossy",
+      "position": [2.0, 1.5, 2.0],
+      "radius": 1.5
+    },
+    {
+      "type": "sphere",
+      "name": "GreenSphere",
+      "materialId": "green_matte",
+      "position": [0.0, 0.8, 5.5],
+      "radius": 0.8
+    },
+    {
+      "type": "plane",
+      "name": "Floor",
+      "materialId": "white_floor",
+      "position": [0.0, 0.0, 0.0],
+      "normal": [0.0, 1.0, 0.0]
+    },
+    {
+      "type": "plane",
+      "name": "BackWall",
+      "materialId": "back_wall",
+      "position": [0.0, 0.0, 10.0],
+      "normal": [0.0, 0.0, -1.0]
+    }
+  ]
+}

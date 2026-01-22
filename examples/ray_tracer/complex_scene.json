@@ -1,0 +1,117 @@
+{
+  "imageWidth": 800,
+  "imageHeight": 600,
+  "focalDistance": 5.0,
+  "samplesPerPixel": 2,
+  "camera": {
+    "position": [0.0, 2.0, -8.0],
+    "direction": [0.0, -0.1, 1.0],
+    "normalUp": [0.0, 1.0, 0.0],
+    "angleOfVision": 60.0
+  },
+  "rayMaxBounces": 5,
+  "backgroundColor": [0.1, 0.2, 0.3],
+  "ambientLight": [0.05, 0.05, 0.05],
+  "materials": [
+    {
+      "id": "mirror",
+      "color": [0.9, 0.9, 0.9],
+      "diffuseCoefficient": 0.1,
+      "specularCoefficient": 0.9,
+      "specularHardness": 100,
+      "reflectivity": 0.9
+    },
+    {
+      "id": "red_matte",
+      "color": [1.0, 0.2, 0.2],
+      "diffuseCoefficient": 0.9,
+      "specularCoefficient": 0.3,
+      "specularHardness": 40,
+      "reflectivity": 0.0
+    },
+    {
+      "id": "green_shiny",
+      "color": [0.2, 1.0, 0.2],
+      "diffuseCoefficient": 0.7,
+      "specularCoefficient": 0.8,
+      "specularHardness": 80,
+      "reflectivity": 0.4
+    },
+    {
+      "id": "blue_glass",
+      "color": [0.3, 0.3, 1.0],
+      "diffuseCoefficient": 0.3,
+      "specularCoefficient": 0.9,
+      "specularHardness": 120,
+      "reflectivity": 0.7
+    },
+    {
+      "id": "floor_checker",
+      "color": [0.8, 0.8, 0.8],
+      "diffuseCoefficient": 0.8,
+      "specularCoefficient": 0.2,
+      "specularHardness": 50,
+      "reflectivity": 0.2
+    }
+  ],
+  "lights": [
+    {
+      "type": "point",
+      "color": [1.0, 1.0, 1.0],
+      "intensity": 1.2,
+      "position": [5.0, 8.0, -3.0]
+    },
+    {
+      "type": "point",
+      "color": [1.0, 0.8, 0.6],
+      "intensity": 0.6,
+      "position": [-4.0, 5.0, -2.0]
+    }
+  ],
+  "primitives": [
+    {
+      "type": "sphere",
+      "name": "MirrorSphere",
+      "materialId": "mirror",
+      "position": [0.0, 1.5, 2.0],
+      "radius": 1.5
+    },
+    {
+      "type": "sphere",
+      "name": "RedSphere",
+      "materialId": "red_matte",
+      "position": [-3.0, 1.0, 1.0],
+      "radius": 1.0
+    },
+    {
+      "type": "sphere",
+      "name": "GreenSphere",
+      "materialId": "green_shiny",
+      "position": [3.5, 1.2, 0.5],
+      "radius": 1.2
+    },
+    {
+      "type": "sphere",
+      "name": "BlueSphere",
+      "materialId": "blue_glass",
+      "position": [1.0, 0.6, -1.0],
+      "radius": 0.6
+    },
+    {
+      "type": "plane",
+      "name": "Floor",
+      "materialId": "floor_checker",
+      "position": [0.0, 0.0, 0.0],
+      "normal": [0.0, 1.0, 0.0]
+    },
+    {
+      "type": "box",
+      "name": "BackWall",
+      "materialId": "floor_checker",
+      "position": [-10.0, 0.0, 5.0],
+      "width": 20.0,
+      "height": 10.0,
+      "depth": 0.1
+    }
+  ]
+}

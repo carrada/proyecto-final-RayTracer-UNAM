@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- Console Appender for development -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- File Appender for production logs -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>logs/ray-tracer.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/ray-tracer.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Application package loggers -->
+  <logger name="unam.ciencias.modeladoyprogramacion.raytracer" level="INFO"/>
+  
+  <!-- Specific logger for rendering progress (can be DEBUG for detailed progress) -->
+  <logger name="unam.ciencias.modeladoyprogramacion.raytracer.RayTracerExecutor" level="INFO"/>
+  <logger name="unam.ciencias.modeladoyprogramacion.raytracer.observers" level="INFO"/>
+  
+  <!-- Scene loading and parsing -->
+  <logger name="unam.ciencias.modeladoyprogramacion.raytracer.SceneLoader" level="WARN"/>
+
+  <!-- Root logger configuration -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <!-- Uncomment for file logging in production -->
+    <!-- <appender-ref ref="FILE"/> -->
+  </root>
+</configuration>

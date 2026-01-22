@@ -1,0 +1,15 @@
+-------------------------------------------------------------------------------
+Test set: unam.ciencias.modeladoyprogramacion.raytracer.CLIOptionsParserImplTest
+-------------------------------------------------------------------------------
+Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.05 s - in unam.ciencias.modeladoyprogramacion.raytracer.CLIOptionsParserImplTest
+parsesThreadsEqualsForm  Time elapsed: 0.04 s
+threadsZeroThrows  Time elapsed: 0.003 s
+parsesOperationSpaceSeparatedForm_defaultThreads  Time elapsed: 0.001 s
+threadsNonIntegerThrows  Time elapsed: 0.001 s
+parsesOperationEqualsForm_defaultThreads  Time elapsed: 0 s
+threadsMissingValueThrows  Time elapsed: 0.001 s
+threadsNegativeThrows  Time elapsed: 0 s
+operationMissingValueThrows  Time elapsed: 0.001 s
+missingOperationThrows  Time elapsed: 0 s
+orderIndependenceAndUnknownIgnored  Time elapsed: 0 s
+parsesThreadsSpaceSeparatedForm  Time elapsed: 0 s
